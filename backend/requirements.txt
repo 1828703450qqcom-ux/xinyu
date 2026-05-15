@@ -1,3 +1,6 @@
 flask
 flask-cors
+flask-limiter
 requests
+bcrypt
+python-dotenv
