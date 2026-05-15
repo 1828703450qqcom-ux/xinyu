@@ -31,6 +31,18 @@ desktop.ini
 # APK builds
 *.apk
 
+# Gradle
+.gradle/
+android/.gradle/
+android/local.properties
+
+# Build outputs
+android/app/build/
+android/build/
+
+# Keystore (sensitive)
+*.keystore
+
 # Node modules
 node_modules/
 
