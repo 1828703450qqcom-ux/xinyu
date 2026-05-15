@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Cat face - warm cream/orange -->
+    <path
+        android:fillColor="#FFE0B2"
+        android:pathData="M54,68 m-26,0 a26,26 0,1 1,52 0 a26,26 0,1 1,-52 0"/>
+    <!-- Left ear -->
+    <path
+        android:fillColor="#FFCC80"
+        android:pathData="M34,48 L28,24 L48,42 Z"/>
+    <!-- Right ear -->
+    <path
+        android:fillColor="#FFCC80"
+        android:pathData="M74,48 L80,24 L60,42 Z"/>
+    <!-- Inner left ear -->
+    <path
+        android:fillColor="#FFAB91"
+        android:pathData="M36,46 L32,30 L46,43 Z"/>
+    <!-- Inner right ear -->
+    <path
+        android:fillColor="#FFAB91"
+        android:pathData="M72,46 L76,30 L62,43 Z"/>
+    <!-- Left eye -->
+    <path
+        android:fillColor="#4A3728"
+        android:pathData="M44,62 m-4,0 a4,4 0,1 1,8 0 a4,4 0,1 1,-8 0"/>
+    <!-- Right eye -->
+    <path
+        android:fillColor="#4A3728"
+        android:pathData="M64,62 m-4,0 a4,4 0,1 1,8 0 a4,4 0,1 1,-8 0"/>
+    <!-- Left eye shine -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M42,60 m-1.5,0 a1.5,1.5 0,1 1,3 0 a1.5,1.5 0,1 1,-3 0"/>
+    <!-- Right eye shine -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M62,60 m-1.5,0 a1.5,1.5 0,1 1,3 0 a1.5,1.5 0,1 1,-3 0"/>
+    <!-- Nose -->
+    <path
+        android:fillColor="#FF8A9B"
+        android:pathData="M54,67 L51,70 L57,70 Z"/>
+    <!-- Mouth left -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="1.2"
+        android:pathData="M54,70 L48,74"/>
+    <!-- Mouth right -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="1.2"
+        android:pathData="M54,70 L60,74"/>
+    <!-- Left cheek -->
+    <path
+        android:fillColor="#30FF8A9B"
+        android:pathData="M38,68 m-5,0 a5,3.5 0,1 1,10 0 a5,3.5 0,1 1,-10 0"/>
+    <!-- Right cheek -->
+    <path
+        android:fillColor="#30FF8A9B"
+        android:pathData="M70,68 m-5,0 a5,3.5 0,1 1,10 0 a5,3.5 0,1 1,-10 0"/>
+    <!-- Whisker left top -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.8"
+        android:pathData="M40,66 L22,62"/>
+    <!-- Whisker left mid -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.8"
+        android:pathData="M40,68 L22,68"/>
+    <!-- Whisker left bottom -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.8"
+        android:pathData="M40,70 L22,74"/>
+    <!-- Whisker right top -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.8"
+        android:pathData="M68,66 L86,62"/>
+    <!-- Whisker right mid -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.8"
+        android:pathData="M68,68 L86,68"/>
+    <!-- Whisker right bottom -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.8"
+        android:pathData="M68,70 L86,74"/>
+    <!-- Small heart above head -->
+    <path
+        android:fillColor="#FF6B8A"
+        android:pathData="M54,18 C54,18 48,13 48,10 C48,7 50,5 52,5 C53,5 54,6 54,7 C54,6 55,5 56,5 C58,5 60,7 60,10 C60,13 54,18 54,18Z"/>
+</vector>

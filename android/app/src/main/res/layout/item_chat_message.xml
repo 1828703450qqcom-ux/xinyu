@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
+
+    <!-- AI Message -->
+    <LinearLayout
+        android:id="@+id/layout_ai"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_ai_avatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_ai_avatar"
+            android:padding="2dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_cat_spring" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="0.85"
+            app:cardBackgroundColor="#EDE7F6"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <TextView
+                android:id="@+id/tv_ai_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:lineSpacingExtra="3dp" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <!-- User Message -->
+    <LinearLayout
+        android:id="@+id/layout_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="0.85"
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <TextView
+                android:id="@+id/tv_user_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:lineSpacingExtra="3dp" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_user_avatar"
+            android:gravity="center"
+            android:text="😊"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+</LinearLayout>

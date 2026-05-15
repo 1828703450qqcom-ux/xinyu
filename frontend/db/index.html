@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库管理</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">🗄️</span>
+                <h1>SQLite 数据库管理</h1>
+            </div>
+            <nav>
+                <a href="#overview" class="nav-link active">概览</a>
+                <a href="#tables" class="nav-link">数据表</a>
+                <a href="#query" class="nav-link">SQL查询</a>
+            </nav>
+        </header>
+
+        <!-- 概览 -->
+        <section id="overview" class="section">
+            <div class="section-header">
+                <h2>数据库概览</h2>
+            </div>
+            <div class="stats-grid" id="dbStats"></div>
+            <div class="table-list" id="tableList"></div>
+        </section>
+
+        <!-- 数据表 -->
+        <section id="tables" class="section">
+            <div class="section-header">
+                <h2>数据表管理</h2>
+                <select id="tableSelect" onchange="loadTableData()">
+                    <option value="">选择表...</option>
+                </select>
+            </div>
+            <div class="table-actions">
+                <button class="btn-danger" onclick="clearCurrentTable()">🗑️ 清空表</button>
+                <span id="tableInfo"></span>
+            </div>
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+            <div id="emptyMsg" class="empty-msg" style="display:none">暂无数据</div>
+            <div class="pagination" id="pagination"></div>
+        </section>
+
+        <!-- SQL查询 -->
+        <section id="query" class="section">
+            <div class="section-header">
+                <h2>SQL查询</h2>
+                <p>只允许SELECT查询，禁止修改操作</p>
+            </div>
+            <div class="query-box">
+                <textarea id="sqlInput" placeholder="输入SQL查询语句，例如：SELECT * FROM students LIMIT 10"></textarea>
+                <button class="btn-primary" onclick="executeQuery()">▶ 执行查询</button>
+            </div>
+            <div id="queryResult" class="query-result" style="display:none">
+                <div id="queryInfo"></div>
+                <div class="table-container">
+                    <table id="queryTable">
+                        <thead id="queryHead"></thead>
+                        <tbody id="queryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="quick-queries">
+                <h3>快捷查询</h3>
+                <button onclick="quickQuery('SELECT name, type FROM sqlite_master WHERE type=\"table\"')">查看所有表</button>
+                <button onclick="quickQuery('SELECT * FROM moods ORDER BY created_at DESC LIMIT 10')">最近心情记录</button>
+                <button onclick="quickQuery('SELECT * FROM students ORDER BY created_at DESC LIMIT 10')">学生列表</button>
+                <button onclick="quickQuery('SELECT mood, COUNT(*) as count FROM moods GROUP BY mood')">心情统计</button>
+                <button onclick="quickQuery('SELECT * FROM checkins ORDER BY created_at DESC LIMIT 10')">打卡记录</button>
+                <button onclick="quickQuery('SELECT role, COUNT(*) as count FROM chat_history GROUP BY role')">聊天统计</button>
+            </div>
+        </section>
+
+        <footer>
+            <p>🗄️ SQLite 数据库管理面板</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

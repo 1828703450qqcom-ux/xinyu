@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>暖茶小筑</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="icon" href="/logo.jpg" type="image/jpeg">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#FF6B8A;--primary-dark:#E85577;--primary-light:#FFB6C1;--bg:#FFF8F0;--surface:#FFFFFF;--text:#333;--text2:#999;--text3:#B0A89E;--border:#F0EBE5;--accent:#7986CB;--green:#4CAF50;--red:#D32F2F;--sunset1:#FF8A9B;--sunset2:#FFB6C1;--sunset3:#FFDAB9;--card-bg:#FFFFFF;--card-shadow:rgba(0,0,0,.06);--input-bg:#fff;--active-bg:#f5f0eb;--header-text:#6D4C41;--header-sub:#8D6E63;--profile-bg:#FFF0F3;--unread-bg:#FFF5F7;--badge-bg:#E3F2FD;--badge-text:#2196F3;--progress-bg:#f0f0f0}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+.app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;overflow:hidden}
+.page{display:none;min-height:100vh;padding-bottom:56px;overflow-y:auto}
+.page.active{display:block}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);display:flex;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.06);padding:0;padding-bottom:env(safe-area-inset-bottom,0)}
+.nav-item{flex:1;text-align:center;padding:6px 0 4px;cursor:pointer;color:var(--text3);transition:.2s;position:relative}
+.nav-item.active{color:var(--primary)}
+.nav-item .icon{font-size:24px;display:block;margin-bottom:1px}
+.nav-item .label{font-size:10px}
+.nav-item.active::after{content:'';position:absolute;top:0;left:25%;right:25%;height:2px;background:var(--primary);border-radius:0 0 2px 2px}
+.header-sunset{background:linear-gradient(180deg,var(--sunset1) 0%,var(--sunset2) 50%,var(--sunset3) 100%);padding:20px 20px 16px;color:#6D4C41}
+.header-gradient{background:linear-gradient(135deg,var(--sunset1),var(--sunset2));padding:16px 20px;color:#fff}
+.header h1{font-size:22px;font-weight:700}
+.header p{font-size:13px;opacity:.85;margin-top:2px}
+.header-row{display:flex;align-items:center;justify-content:space-between}
+.card{background:var(--card-bg);border-radius:20px;padding:16px;margin:0 16px 12px;box-shadow:0 2px 12px var(--card-shadow)}
+.card-elevated{box-shadow:0 3px 15px rgba(0,0,0,.08)}
+.card-section{margin:0 16px 12px}
+.card-section-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 24px;border-radius:24px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--primary);color:var(--primary)}
+.btn-sm{padding:6px 14px;font-size:12px;border-radius:16px}
+.btn-block{display:block;width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:14px;font-size:14px;outline:none;transition:.2s;background:var(--input-bg);color:var(--text)}
+.input:focus{border-color:var(--primary)}
+textarea.input{min-height:80px;resize:vertical;font-family:inherit}
+.tag{display:inline-block;padding:5px 14px;border-radius:20px;font-size:12px;margin:3px;cursor:pointer;transition:.15s;border:1.5px solid transparent}
+.tag-mood{background:#FFE0EC;color:var(--primary)}
+.tag-interest{background:#E8EAF6;color:var(--accent)}
+.tag.selected{border-color:var(--primary);font-weight:600;background:#FFD0DE}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-pink{background:#FFE0EC;color:var(--primary)}
+.badge-blue{background:#E3F2FD;color:#2196F3}
+.badge-green{background:#E8F5E9;color:var(--green)}
+.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;padding:10px 24px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.chat-container{display:flex;flex-direction:column;height:calc(100vh - 56px)}
+.chat-messages{flex:1;overflow-y:auto;padding:12px 12px 4px}
+.chat-bubble{max-width:80%;padding:11px 15px;border-radius:18px;margin-bottom:8px;font-size:14px;line-height:1.6;word-break:break-word}
+.chat-bubble.me{background:var(--primary);color:#fff;margin-left:auto;border-bottom-right-radius:6px}
+.chat-bubble.other{background:#F5F0EB;color:var(--text);margin-right:auto;border-bottom-left-radius:6px}
+.chat-input-bar{display:flex;gap:8px;padding:10px 12px;background:var(--surface);border-top:1px solid var(--border)}
+.chat-input-bar input{flex:1}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;padding:20px 20px 24px;animation:slideUp .25s}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mood-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mood-item{text-align:center;padding:10px 0;border-radius:14px;cursor:pointer;transition:.15s;background:var(--surface);border:1.5px solid transparent}
+.mood-item:active,.mood-item.selected{background:#FFE0EC;border-color:var(--primary)}
+.mood-item .emoji{font-size:30px}
+.mood-item .label{font-size:11px;margin-top:3px;color:var(--text2)}
+.post-card{background:var(--card-bg);border-radius:18px;padding:16px;margin:0 16px 10px;box-shadow:0 2px 10px var(--card-shadow)}
+.post-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.post-author{font-weight:600;color:var(--accent);font-size:13px}
+.post-time{font-size:11px;color:var(--text3)}
+.post-content{font-size:14px;line-height:1.65;margin-bottom:8px;color:var(--text)}
+.post-actions{display:flex;gap:18px;font-size:12px;color:var(--text3)}
+.post-actions span{cursor:pointer;display:flex;align-items:center;gap:3px}
+.post-actions span:active{opacity:.6}
+.user-card{background:var(--card-bg);border-radius:18px;padding:16px;margin:0 16px 10px;box-shadow:0 2px 10px var(--card-shadow)}
+.match-card{background:var(--card-bg);border-radius:14px;padding:14px;margin:0 16px 8px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 6px var(--card-shadow);cursor:pointer}
+.match-card:active{background:#f9f9f9}
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty .icon{font-size:52px;margin-bottom:12px}
+.empty .text{font-size:13px;line-height:1.6}
+.tab-bar{display:flex;background:var(--surface);padding:0 16px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.tab-item{padding:12px 16px;font-size:14px;color:var(--text3);cursor:pointer;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap}
+.tab-item.active{color:var(--primary);border-color:var(--primary);font-weight:600}
+.loading{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.test-card{background:var(--card-bg);border-radius:18px;padding:16px;margin:0 16px 10px;box-shadow:0 2px 10px var(--card-shadow);cursor:pointer}
+.test-card:active{background:#fafafa}
+.test-title{font-weight:600;font-size:15px}
+.test-desc{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5}
+.progress-bar{height:6px;background:var(--progress-bg);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--primary);border-radius:3px;transition:width .3s}
+.weekday-tabs{display:flex;gap:6px;overflow-x:auto;padding:12px 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.weekday-tabs::-webkit-scrollbar{display:none}
+.week-tab{padding:7px 16px;border-radius:20px;font-size:13px;white-space:nowrap;cursor:pointer;border:1px solid var(--border);color:var(--text3);transition:.15s;flex-shrink:0}
+.week-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.course-card{background:var(--card-bg);border-radius:14px;padding:14px;margin:0 16px 8px;display:flex;gap:12px;box-shadow:0 1px 6px var(--card-shadow)}
+.course-bar{width:4px;border-radius:2px;flex-shrink:0}
+.course-info{flex:1}
+.course-name{font-weight:600;font-size:15px}
+.course-detail{font-size:12px;color:var(--text2);margin-top:4px}
+.note-card{background:var(--card-bg);border-radius:14px;padding:14px;margin:0 0 8px;box-shadow:0 1px 6px var(--card-shadow);cursor:pointer}
+.note-card:active{background:#fafafa}
+.note-title{font-weight:600;font-size:14px}
+.note-preview{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.note-time{font-size:11px;color:var(--text3);margin-top:6px}
+.history-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.history-item:last-child{border-bottom:none}
+.history-emoji{font-size:28px}
+.history-info{flex:1}
+.history-label{font-size:14px;font-weight:500}
+.history-time{font-size:11px;color:var(--text3);margin-top:2px}
+.pet-card{background:linear-gradient(135deg,#FFE0B2,#FFCC80);border-radius:20px;padding:16px;margin:0 16px 12px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.pet-card:active{opacity:.92}
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px 12px}
+.action-card{border-radius:20px;padding:18px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;color:#fff;font-weight:600;box-shadow:0 3px 12px rgba(0,0,0,.1)}
+.action-card:active{opacity:.9;transform:scale(.98)}
+.action-card .aicon{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.action-card .atext{font-size:15px;font-weight:700}
+.action-card .asub{font-size:11px;font-weight:400;opacity:.85;margin-top:2px}
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 16px 12px}
+.quick-item{background:var(--surface);border-radius:18px;padding:14px 0;text-align:center;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.quick-item:active{background:#f5f0eb}
+.quick-item .qi-icon{font-size:26px}
+.quick-item .qi-label{font-size:11px;margin-top:4px;color:var(--text)}
+.weather-card{background:var(--surface);border-radius:20px;padding:16px;margin:0 16px 12px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);cursor:pointer}
+.weather-card:active{opacity:.92}
+.quote-card{background:#FFF8E1;border-radius:20px;padding:16px;margin:0 16px 12px;display:flex;gap:10px;align-items:flex-start}
+.quote-text{font-size:14px;line-height:1.7;color:var(--text);flex:1}
+.quote-flower{font-size:28px;flex-shrink:0}
+.quote-author{font-size:12px;color:var(--text3);margin-top:6px;text-align:right}
+.stats-row{display:flex;gap:10px;margin:0 16px 12px}
+.stat-card{flex:1;background:var(--surface);border-radius:16px;padding:14px 10px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.stat-num{font-size:22px;font-weight:700;color:var(--primary)}
+.stat-label{font-size:11px;color:var(--text2);margin-top:2px}
+.profile-header{background:var(--surface);border-radius:18px;padding:20px;margin:0 16px 12px;display:flex;align-items:center;gap:16px;box-shadow:0 1px 6px rgba(0,0,0,.04);position:relative;overflow:hidden}
+.profile-avatar{width:60px;height:60px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.profile-menu-group{background:var(--surface);border-radius:16px;margin:0 16px 12px;box-shadow:0 1px 6px rgba(0,0,0,.04);overflow:hidden}
+.profile-menu-item{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;border-bottom:1px solid var(--border)}
+.profile-menu-item:last-child{border-bottom:none}
+.profile-menu-item:active{background:#fafafa}
+.profile-menu-item .pm-icon{font-size:20px;width:28px;text-align:center}
+.profile-menu-item .pm-label{flex:1;font-size:14px}
+.profile-menu-item .pm-arrow{color:var(--text3);font-size:13px}
+.pomo-display{text-align:center;padding:30px 0}
+.pomo-time{font-size:60px;font-weight:200;color:var(--primary);font-variant-numeric:tabular-nums;letter-spacing:2px}
+.pomo-label{font-size:13px;color:var(--text2);margin-top:8px}
+.pomo-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+/* Study page sub-tabs */
+.study-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border)}
+.study-tab{flex:1;text-align:center;padding:12px 0;font-size:14px;color:var(--text3);cursor:pointer;transition:.2s;position:relative}
+.study-tab.active{color:var(--primary);font-weight:600}
+.study-tab.active::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2.5px;background:var(--primary);border-radius:2px 2px 0 0}
+.notif-bell{position:relative;cursor:pointer;background:rgba(255,255,255,.5);border-radius:20px;padding:6px 10px;font-size:18px}
+.notif-badge{position:absolute;top:0;right:0;background:var(--red);color:#fff;font-size:10px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;padding:0 4px}
+.notif-panel{position:fixed;top:0;right:0;width:100%;max-width:400px;height:100%;background:var(--surface);z-index:200;box-shadow:-4px 0 20px rgba(0,0,0,.15);transform:translateX(100%);transition:transform .3s;overflow-y:auto}
+.notif-panel.open{transform:translateX(0)}
+.notif-item{padding:14px 16px;border-bottom:1px solid var(--border)}
+.notif-item .notif-from{font-weight:600;font-size:13px;color:var(--accent)}
+.notif-item .notif-text{font-size:13px;line-height:1.5;margin-top:4px;color:var(--text)}
+.notif-item .notif-time{font-size:11px;color:var(--text3);margin-top:4px}
+.notif-item.unread{background:#FFF5F7}
+.study-content{display:none}
+.study-content.active{display:block}
+/* FAB */
+.fab{position:fixed;bottom:80px;right:calc(50% - 210px);width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:24px;box-shadow:0 4px 16px rgba(0,0,0,.2);cursor:pointer;z-index:50;display:flex;align-items:center;justify-content:center;transition:.2s}
+.fab:active{transform:scale(.9)}
+/* Notif banner */
+.notif-banner{background:#FFF3E0;padding:10px 16px;display:flex;align-items:center;gap:8px;font-size:13px;color:#E65100}
+.notif-banner .close{margin-left:auto;cursor:pointer;font-size:16px;color:#BF360C}
+/* Toggle switch */
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;inset:0;background:#ccc;border-radius:24px;cursor:pointer;transition:.3s}
+.toggle .slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle input:checked+.slider{background:var(--primary)}
+.toggle input:checked+.slider::before{transform:translateX(20px)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="toast" id="toast"></div>
+
+  <!-- LOGIN -->
+  <div class="page active" id="page-login">
+    <div style="background:linear-gradient(180deg,var(--sunset1),var(--sunset2),var(--sunset3));padding:60px 24px 40px;text-align:center">
+      <img src="/logo.jpg" style="width:120px;height:120px;border-radius:24px;object-fit:cover;margin-bottom:12px;box-shadow:0 4px 20px rgba(0,0,0,.15)">
+      <h1 style="font-size:30px;color:#6D4C41;font-weight:700">暖茶小筑</h1>
+      <p style="color:#8D6E63;font-size:14px;margin-top:6px">你的心灵港湾</p>
+    </div>
+    <div style="padding:24px 24px 0">
+      <input class="input" id="login-user" placeholder="用户名" style="margin-bottom:12px">
+      <input class="input" id="login-pass" type="password" placeholder="密码" style="margin-bottom:16px">
+      <button class="btn btn-primary btn-block" onclick="doLogin()">登录</button>
+      <p style="text-align:right;margin-top:8px;font-size:12px"><a href="#" onclick="event.preventDefault();showForgotPassword()" style="color:var(--primary);text-decoration:none">忘记密码？</a></p>
+      <p style="text-align:center;margin-top:10px;font-size:13px;color:var(--text2)">没有账号？<a href="#" onclick="event.preventDefault();showPage('register')" style="color:var(--primary);text-decoration:none">注册</a></p>
+      <p style="text-align:center;margin-top:10px;font-size:12px"><a href="#" onclick="event.preventDefault();skipLogin()">游客模式体验 →</a></p>
+    </div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="page" id="page-register">
+    <div class="header-gradient"><div class="header-row"><h1 style="font-size:18px">注册账号</h1><span onclick="showPage('login')" style="cursor:pointer;font-size:14px">← 返回</span></div></div>
+    <!-- Step 1: 选择身份 -->
+    <div id="reg-step1" style="padding:20px 24px">
+      <p style="font-size:14px;color:var(--text2);margin-bottom:16px;text-align:center">选择你的身份</p>
+      <div onclick="selectRegType('user')" style="background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:32px">😊</div>
+        <div><div style="font-size:15px;font-weight:600">普通用户</div><div style="font-size:12px;color:var(--text2);margin-top:2px">使用全部功能，记录心情、参与社区</div></div>
+      </div>
+      <div onclick="selectRegType('volunteer')" style="background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:32px">🤝</div>
+        <div><div style="font-size:15px;font-weight:600">大学生志愿者</div><div style="font-size:12px;color:var(--text2);margin-top:2px">帮助他人，参与心理互助活动（需审核）</div></div>
+      </div>
+      <div onclick="selectRegType('counselor')" style="background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:32px">👨‍⚕️</div>
+        <div><div style="font-size:15px;font-weight:600">认证心理辅导师</div><div style="font-size:12px;color:var(--text2);margin-top:2px">提供专业心理辅导服务（需资质审核）</div></div>
+      </div>
+    </div>
+    <!-- Step 2: 填写表单 -->
+    <div id="reg-step2" style="padding:20px 24px;display:none">
+      <div style="display:flex;align-items:center;margin-bottom:16px">
+        <span onclick="showRegStep1()" style="cursor:pointer;font-size:14px;color:var(--primary)">← 重新选择</span>
+        <span id="reg-type-label" style="margin-left:8px;font-size:14px;font-weight:600"></span>
+      </div>
+      <input class="input" id="reg-user" placeholder="用户名" style="margin-bottom:12px">
+      <input class="input" id="reg-pass" type="password" placeholder="密码" style="margin-bottom:12px">
+      <input class="input" id="reg-nick" placeholder="昵称（选填）" style="margin-bottom:14px">
+      <div style="display:flex;gap:10px;margin-bottom:16px">
+        <button class="btn btn-outline" id="reg-male" style="flex:1;background:var(--primary-light);border-color:var(--primary)" onclick="selectGender('male')">👦 男</button>
+        <button class="btn btn-outline" id="reg-female" style="flex:1" onclick="selectGender('female')">👧 女</button>
+      </div>
+      <!-- 志愿者额外字段 -->
+      <div id="reg-volunteer-fields" style="display:none">
+        <input class="input" id="reg-university" placeholder="学校名称" style="margin-bottom:12px">
+        <input class="input" id="reg-student-id" placeholder="学号" style="margin-bottom:12px">
+        <textarea class="input" id="reg-reason" placeholder="为什么想成为志愿者？" style="min-height:60px;margin-bottom:14px"></textarea>
+      </div>
+      <!-- 心理辅导师额外字段 -->
+      <div id="reg-counselor-fields" style="display:none">
+        <input class="input" id="reg-real-name" placeholder="真实姓名" style="margin-bottom:12px">
+        <input class="input" id="reg-institution" placeholder="执业机构" style="margin-bottom:12px">
+        <input class="input" id="reg-license-no" placeholder="心理咨询资格证号" style="margin-bottom:12px">
+        <input class="input" id="reg-specialization" placeholder="擅长领域（选填）" style="margin-bottom:14px">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="doRegister()">注册</button>
+    </div>
+  </div>
+
+  <!-- HOME - 筑爱故事汇 -->
+  <div class="page" id="page-home">
+    <div style="background:linear-gradient(180deg,#FFB6C1 0%,#FFD1DC 40%,#FFE4EC 70%,var(--bg) 100%);padding:20px 20px 0;border-radius:0 0 28px 28px;position:relative;overflow:hidden">
+      <!-- 樱花装饰 -->
+      <div style="position:absolute;top:-20px;right:-15px;font-size:80px;opacity:.2;transform:rotate(20deg);filter:blur(1px)">🌸</div>
+      <div style="position:absolute;top:10px;right:50px;font-size:45px;opacity:.15;transform:rotate(-15deg);filter:blur(.5px)">🌸</div>
+      <div style="position:absolute;top:35px;right:95px;font-size:25px;opacity:.12;transform:rotate(30deg)">🌸</div>
+      <div style="position:absolute;top:-5px;right:110px;font-size:18px;opacity:.1;transform:rotate(-25deg)">🌸</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:36px;line-height:1">🏠</div>
+          <div>
+            <div style="font-size:22px;font-weight:800;color:#5D4037;letter-spacing:1px">筑爱故事汇</div>
+            <div style="font-size:13px;color:#8D6E63;margin-top:3px">分享温暖，传递力量</div>
+          </div>
+        </div>
+        <div onclick="toggleNotifPanel()" id="notif-bell" style="width:40px;height:40px;background:rgba(255,255,255,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.06);position:relative">🔔<span class="notif-badge" id="notif-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;font-size:10px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px">0</span></div>
+      </div>
+      <!-- Search Bar -->
+      <div style="display:flex;gap:10px;margin-top:14px;align-items:center;position:relative;z-index:1">
+        <div style="flex:1;display:flex;align-items:center;background:rgba(255,255,255,.9);border-radius:28px;padding:0 16px;box-shadow:0 2px 12px rgba(0,0,0,.05);height:44px">
+          <span style="font-size:17px;margin-right:10px;opacity:.45">🔍</span>
+          <input id="story-search-input" style="flex:1;padding:0;font-size:14px;border:none;background:transparent;outline:none;color:#333;height:100%" placeholder="搜索故事、标签..." onkeydown="if(event.key==='Enter')searchStories()">
+        </div>
+        <button style="border:none;border-radius:24px;padding:0 22px;height:44px;background:linear-gradient(135deg,#FF6B8A,#FF8E9E);color:#fff;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 3px 10px rgba(255,107,138,.3)" onclick="searchStories()">搜索</button>
+      </div>
+    </div>
+    <!-- Sort & Filter -->
+    <div style="display:flex;gap:10px;padding:16px 18px 10px;align-items:center">
+      <div id="story-sort-hot" style="background:linear-gradient(135deg,#FF6B8A,#FF8E9E);color:#fff;border:none;border-radius:22px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 10px rgba(255,107,138,.25)" onclick="loadStories('hot')">🔥 热门</div>
+      <div id="story-sort-time" style="background:#fff;color:#999;border:1.5px solid #F0EBE5;border-radius:22px;padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer" onclick="loadStories('time')">🕐 最新</div>
+      <div style="flex:1"></div>
+      <button onclick="showNewStory()" style="border:none;border-radius:22px;padding:9px 22px;background:linear-gradient(135deg,#FF6B8A,#FF8E9E);color:#fff;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 10px rgba(255,107,138,.25)">✏️ 发布</button>
+    </div>
+    <!-- Tags filter -->
+    <div style="display:flex;gap:10px;padding:4px 18px 14px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+      <div onclick="filterStoryTag('')" style="flex-shrink:0;width:56px;height:56px;border-radius:50%;background:#FFE0EC;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#D4507A;cursor:pointer;transition:.2s">全部</div>
+      <div onclick="filterStoryTag('励志')" style="flex-shrink:0;width:56px;height:56px;border-radius:50%;background:#DBEAFE;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#3B82F6;cursor:pointer;transition:.2s">励志</div>
+      <div onclick="filterStoryTag('温暖')" style="flex-shrink:0;width:56px;height:56px;border-radius:50%;background:#D1FAE5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#10B981;cursor:pointer;transition:.2s">温暖</div>
+      <div onclick="filterStoryTag('成长')" style="flex-shrink:0;width:56px;height:56px;border-radius:50%;background:#FEF3C7;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#F59E0B;cursor:pointer;transition:.2s">成长</div>
+      <div onclick="filterStoryTag('感悟')" style="flex-shrink:0;width:56px;height:56px;border-radius:50%;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#8B5CF6;cursor:pointer;transition:.2s">感悟</div>
+      <div onclick="filterStoryTag('日常')" style="flex-shrink:0;width:56px;height:56px;border-radius:50%;background:#E0F2FE;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#0EA5E9;cursor:pointer;transition:.2s">日常</div>
+    </div>
+    <!-- Story List -->
+    <div id="story-list" style="padding:0 4px"><div class="loading">加载中...</div></div>
+  </div>
+
+  <!-- AI CHAT -->
+  <div class="page" id="page-ai">
+    <div class="header-gradient"><div class="header-row"><h1 style="font-size:18px">AI小助手</h1><span onclick="showPage('home')" style="cursor:pointer">← 返回</span></div></div>
+    <div class="chat-container">
+      <div class="chat-messages" id="ai-messages">
+        <div class="chat-bubble other">你好呀~ 我是心屿AI小助手，有什么想聊的吗？我会认真倾听你的每一个想法 💕</div>
+      </div>
+      <div class="chat-input-bar">
+        <input class="input" id="ai-input" placeholder="说点什么..." onkeydown="if(event.key==='Enter')sendAI()">
+        <button class="btn btn-primary btn-sm" onclick="sendAI()">发送</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOOD -->
+  <div class="page" id="page-mood">
+    <div style="background:linear-gradient(180deg,#FF8A9B,#FFB6C1);padding:16px 20px 12px">
+      <h1 style="font-size:22px;font-weight:700;color:#fff">🌈 心晴评测</h1>
+    </div>
+    <!-- Tab Bar -->
+    <div style="display:flex;background:var(--surface);padding:0 12px;height:44px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+      <div id="tab-mood-rec" onclick="switchEmotionTab(0)" style="flex:1;text-align:center;padding:10px 0;font-size:14px;font-weight:700;color:var(--primary);border-bottom:2.5px solid var(--primary)">😊 心情记录</div>
+      <div id="tab-mood-test" onclick="switchEmotionTab(1)" style="flex:1;text-align:center;padding:10px 0;font-size:14px;color:var(--text3);border-bottom:2.5px solid transparent">📋 心理测评</div>
+    </div>
+    <!-- Mood Content -->
+    <div id="mood-content">
+    <!-- Mood Dial -->
+    <div style="text-align:center;padding:16px 16px 8px">
+      <div style="position:relative;display:inline-block" id="mood-dial-container">
+        <div id="mood-dial" onclick="rotateMoodDial(event)" style="width:220px;height:220px;border-radius:50%;background:conic-gradient(from 0deg,#FFE0EC 0%,#FFE0EC 12.5%,#FFF3CD 12.5%,#FFF3CD 25%,#FFF9C4 25%,#FFF9C4 37.5%,#E1F5FE 37.5%,#E1F5FE 50%,#E8EAF6 50%,#E8EAF6 62.5%,#F3E5F5 62.5%,#F3E5F5 75%,#FFE0B2 75%,#FFE0B2 87.5%,#FFE0EC 87.5%,#FFE0EC 100%);margin:0 auto;position:relative;box-shadow:0 4px 16px rgba(0,0,0,.1)">
+          <div id="mood-dial-arrow" style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:16px solid var(--primary);transition:transform .3s;z-index:2"></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(255,255,255,.85);border-radius:50%;margin:12px;opacity:0.95">
+            <div style="font-size:48px" id="mood-dial-emoji">😊</div>
+            <div style="font-size:16px;font-weight:700;color:var(--primary);margin-top:4px" id="mood-dial-label">开心</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text3);margin-top:8px">点击圆盘选择心情</div>
+    </div>
+    <!-- Confirm Button -->
+    <div style="text-align:center;padding:0 16px 8px">
+      <button class="btn btn-primary" style="background:linear-gradient(135deg,#FF8A9B,#FFB6C1);border:none;border-radius:22px;padding:10px 40px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(255,107,138,.3)" onclick="confirmMood()">记录此刻心情</button>
+    </div>
+    <!-- Note Input -->
+    <div style="padding:0 16px 12px">
+      <textarea class="input" id="mood-note" placeholder="写点什么记录此刻心情..." style="rows:2" rows="2"></textarea>
+    </div>
+    <!-- AI Emotion Assess -->
+    <div style="background:linear-gradient(135deg,#7986CB,#9FA8DA);margin:0 16px 12px;border-radius:16px;padding:16px;color:#fff;cursor:pointer" onclick="showAIEmotionAssess()">
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px">🤖 AI情绪评估</div>
+      <div style="font-size:12px;opacity:.85">描述你的情绪，AI帮你分析和建议</div>
+      <div style="font-size:11px;margin-top:8px;background:rgba(255,255,255,.2);border-radius:8px;padding:8px;text-align:center">点击开始评估</div>
+    </div>
+    <!-- Stats Card -->
+    <div style="background:var(--surface);margin:0 16px 12px;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+      <div style="display:flex;justify-content:space-around">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:700;color:var(--primary)" id="mood-stat-count">0</div>
+          <div style="font-size:12px;color:var(--text2)">记录数</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:700;color:var(--accent)" id="mood-stat-days">0</div>
+          <div style="font-size:12px;color:var(--text2)">打卡天数</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:700;color:var(--primary)" id="mood-stat-happy">0%</div>
+          <div style="font-size:12px;color:var(--text2)">开心比例</div>
+        </div>
+      </div>
+    </div>
+    <!-- Trend Chart -->
+    <div style="background:var(--surface);margin:0 16px 12px;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">📈 情绪趋势</div>
+      <canvas id="mood-trend-canvas" width="600" height="160" style="width:100%;height:120px"></canvas>
+    </div>
+    <!-- History -->
+    <div style="margin:0 16px 16px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px">最近记录</div>
+      <div id="mood-history-list"></div>
+    </div>
+    </div>
+    <!-- Test Content -->
+    <div id="test-content" style="display:none">
+    <div style="padding:12px 16px">
+      <div id="test-list-on-emotion"></div>
+    </div>
+    <div style="padding:0 16px 12px"><h3 style="font-size:15px;margin-bottom:8px">📜 测评历史</h3><div id="test-history-on-emotion"></div></div>
+    </div>
+  </div>
+
+  <!-- SQUARE -->
+  <div class="page" id="page-square">
+    <div class="tab-bar">
+      <div class="tab-item active" onclick="switchMainTab(0,this)">🫧 叙心树洞</div>
+      <div class="tab-item" onclick="switchMainTab(1,this)">💬 投递树洞</div>
+    </div>
+    <!-- Notification banner -->
+    <div class="notif-banner" id="notif-banner" style="display:none">
+      <span>🔔</span><span id="notif-text"></span><span class="close" onclick="document.getElementById('notif-banner').style.display='none'">✕</span>
+    </div>
+    <div id="tab-square-content">
+      <div style="display:flex;gap:6px;padding:12px 16px;align-items:center">
+        <div class="btn btn-sm" id="sq-sort-time" style="background:var(--primary);color:#fff;border:1px solid var(--primary)" onclick="loadSquare('time')">最新</div>
+        <div class="btn btn-sm" id="sq-sort-hot" style="background:var(--surface);color:var(--text3);border:1px solid var(--border)" onclick="loadSquare('hot')">最热</div>
+      </div>
+      <div id="square-posts"><div class="loading">加载中...</div></div>
+    </div>
+    <div id="tab-support-content" style="display:none">
+      <div style="display:flex;gap:6px;padding:12px 16px;align-items:center">
+        <div class="btn btn-sm" id="case-sort-hot" style="background:var(--primary);color:#fff;border:1px solid var(--primary)" onclick="loadCases('hot')">最热</div>
+        <div class="btn btn-sm" id="case-sort-time" style="background:var(--surface);color:var(--text3);border:1px solid var(--border)" onclick="loadCases('time')">最新</div>
+        <div style="flex:1"></div>
+        <span style="font-size:12px;color:var(--text2)">💡 心理辅导师在线答疑</span>
+      </div>
+      <div id="treehole-cases"><div class="loading">加载中...</div></div>
+    </div>
+    <!-- FAB -->
+    <button class="fab" onclick="showNewPost()">+</button>
+  </div>
+
+  <!-- SUPPORT CHAT -->
+  <div class="page" id="page-support-chat">
+    <div class="header-gradient"><div class="header-row"><h1 id="chat-partner-name" style="font-size:18px">聊天</h1><span onclick="showPage('square')" style="cursor:pointer">← 返回</span></div></div>
+    <div class="chat-container">
+      <div class="chat-messages" id="support-messages"></div>
+      <div class="chat-input-bar">
+        <input class="input" id="support-input" placeholder="说点什么..." onkeydown="if(event.key==='Enter')sendSupportMsg()">
+        <button class="btn btn-primary btn-sm" onclick="sendSupportMsg()">发送</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDY (学习广场) - merged notes/pomodoro/course -->
+  <div class="page" id="page-study">
+    <div class="header-gradient">
+      <div class="header-row">
+        <h1 style="font-size:20px">📚 学习广场</h1>
+        <span onclick="exportStudyData()" style="cursor:pointer;font-size:13px;background:rgba(255,255,255,.2);padding:4px 10px;border-radius:12px">📤 导出</span>
+      </div>
+    </div>
+    <div class="study-tabs">
+      <div class="study-tab active" onclick="switchStudyTab(0,this)">📝 笔记</div>
+      <div class="study-tab" onclick="switchStudyTab(1,this)">📚 课表</div>
+    </div>
+    <!-- Notes -->
+    <div class="study-content active" id="study-notes" style="padding:12px 16px">
+      <button class="btn btn-primary btn-block" style="margin-bottom:12px" onclick="showNewNote()">+ 新建笔记</button>
+      <div id="note-list"></div>
+    </div>
+    <!-- Course -->
+    <div class="study-content" id="study-course">
+      <div class="weekday-tabs" id="course-tabs"></div>
+      <div id="course-list"></div>
+      <div style="padding:8px 16px 16px;display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" style="flex:1" onclick="showAddCourse()">+ 添加课程</button>
+        <label class="btn btn-outline btn-sm" style="flex:1;text-align:center;cursor:pointer">📁 导入课表<input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" style="display:none" onchange="importCourseFile(this)"></label>
+      </div>
+    </div>
+    <!-- Booking Section -->
+    <div style="padding:0 16px 16px">
+      <div style="font-size:15px;font-weight:700;margin-bottom:10px">🎯 活动预约</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:linear-gradient(135deg,#FF8A65,#FF7043);border-radius:16px;padding:16px;color:#fff;cursor:pointer" onclick="showEventsList()">
+          <div style="font-size:28px;margin-bottom:6px">🎫</div>
+          <div style="font-size:14px;font-weight:700">线下活动预约</div>
+          <div style="font-size:11px;opacity:.85;margin-top:4px">讲座、拓展、读书会</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#7986CB,#5C6BC0);border-radius:16px;padding:16px;color:#fff;cursor:pointer" onclick="showClassesList()">
+          <div style="font-size:28px;margin-bottom:6px">💻</div>
+          <div style="font-size:14px;font-weight:700">线上课堂预约</div>
+          <div style="font-size:11px;opacity:.85;margin-top:4px">情绪管理、沟通技巧</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEST LIST -->
+  <div class="page" id="page-test">
+    <div class="header-gradient"><div class="header-row"><h1 style="font-size:18px">📋 心理测评</h1><span onclick="showPage('home')" style="cursor:pointer">← 返回</span></div></div>
+    <!-- Comprehensive Report Button -->
+    <div style="padding:12px 16px 4px">
+      <div style="background:linear-gradient(135deg,#7986CB,#9FA8DA);border-radius:16px;padding:16px;color:#fff;cursor:pointer" onclick="showComprehensiveReport()">
+        <div style="font-size:15px;font-weight:700;margin-bottom:4px">📊 综合心理报告</div>
+        <div style="font-size:12px;opacity:.85">基于PHQ-9、GAD-7、PSS、睡眠量表综合分析</div>
+        <div style="font-size:11px;margin-top:8px;background:rgba(255,255,255,.2);border-radius:8px;padding:8px;text-align:center">点击生成综合报告</div>
+      </div>
+    </div>
+    <div style="padding:12px 0" id="test-list"></div>
+    <div style="padding:0 16px 12px"><h3 style="font-size:15px;margin-bottom:8px">📜 测评历史</h3><div id="test-history"></div></div>
+    <!-- Comprehensive Report Modal -->
+    <div id="comprehensive-report" style="display:none"></div>
+  </div>
+
+  <!-- TEST DO -->
+  <div class="page" id="page-test-do">
+    <div class="header-gradient"><div class="header-row"><h1 id="test-title" style="font-size:18px">测评</h1><span onclick="showPage('test')" style="cursor:pointer">← 返回</span></div></div>
+    <div style="padding:12px 16px" id="test-progress"></div>
+    <div style="padding:0 16px" id="test-question"></div>
+    <div style="padding:12px 16px 16px;display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" id="test-prev" onclick="testPrev()" disabled>上一题</button>
+      <button class="btn btn-primary" style="flex:1" id="test-next" onclick="testNext()">下一题</button>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="page" id="page-profile">
+    <div style="background:var(--profile-bg);padding:16px 0 0;min-height:100vh">
+      <!-- Profile Header Card -->
+      <div class="profile-header" onclick="showEditProfile()">
+        <div class="profile-avatar" id="profile-avatar">😊</div>
+        <div style="flex:1">
+          <div style="font-size:17px;font-weight:700" id="profile-name">用户</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:3px" id="profile-id">ID: --</div>
+          <div id="profile-type-badge" style="display:none;margin-top:4px"></div>
+        </div>
+        <span style="color:var(--text3);font-size:18px">></span>
+        <!-- Cherry blossom decorations -->
+        <span style="position:absolute;top:8px;right:16px;font-size:20px;opacity:.6">🌸</span>
+        <span style="position:absolute;top:28px;right:40px;font-size:12px;opacity:.35">🍃</span>
+      </div>
+
+      <!-- Menu Group 1: General -->
+      <div class="profile-menu-group">
+        <div class="profile-menu-item" onclick="toggleDarkMode()">
+          <span class="pm-icon">🎨</span>
+          <span class="pm-label">深色模式</span>
+          <label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" id="dark-mode-toggle" onchange="applyDarkMode(this.checked)"><span class="slider"></span></label>
+        </div>
+        <div class="profile-menu-item" onclick="showEmergencyContacts()">
+          <span class="pm-icon">🚨</span>
+          <span class="pm-label">紧急联系人</span>
+          <span class="pm-arrow">></span>
+        </div>
+        <div class="profile-menu-item" onclick="showHelplines()">
+          <span class="pm-icon">📞</span>
+          <span class="pm-label">心理求助热线</span>
+          <span class="pm-arrow">></span>
+        </div>
+        <div class="profile-menu-item" onclick="showSetSecurityQuestion()">
+          <span class="pm-icon">🔐</span>
+          <span class="pm-label">设置安全问题</span>
+          <span class="pm-arrow">></span>
+        </div>
+        <div class="profile-menu-item" onclick="toast('蓝牙连接仅在APP中可用')">
+          <span class="pm-icon">📡</span>
+          <span class="pm-label">蓝牙设备连接</span>
+          <span class="pm-arrow">></span>
+        </div>
+      </div>
+
+      <!-- Menu: Healing Mailbox (renamed) -->
+      <div class="profile-menu-group">
+        <div class="profile-menu-item" onclick="showMailbox()">
+          <span class="pm-icon">✉️</span>
+          <span class="pm-label">叙心自语</span>
+          <span class="pm-arrow">></span>
+        </div>
+        <div style="padding:0 16px 10px;font-size:11px;color:var(--text3)">内容全程保密，不会提交至「叙心树洞」</div>
+      </div>
+
+      <!-- Menu: Data Report -->
+      <div class="profile-menu-group">
+        <div class="profile-menu-item" onclick="showDataReport()">
+          <span class="pm-icon">📈</span>
+          <span class="pm-label">数据报告</span>
+          <span class="pm-arrow">></span>
+        </div>
+      </div>
+
+      <!-- Menu: Volunteer -->
+      <div class="profile-menu-group">
+        <div class="profile-menu-item" onclick="showVolunteerApply()">
+          <span class="pm-icon">🤝</span>
+          <span class="pm-label">申请为志愿者</span>
+          <span class="pm-arrow">></span>
+        </div>
+      </div>
+
+      <!-- Menu: Login/Logout -->
+      <div class="profile-menu-group">
+        <div class="profile-menu-item" onclick="doLogout()">
+          <span class="pm-icon" id="login-icon">🔑</span>
+          <span class="pm-label" id="login-label" style="color:var(--primary)">登录</span>
+          <span class="pm-arrow">></span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="text-align:center;padding:24px 0 32px;color:var(--text2);font-size:12px;line-height:1.8">
+        🌸 暖茶小筑 v2.0.0 🌸<br>你的心理健康伙伴
+      </div>
+    </div>
+  </div>
+
+  <!-- MAILBOX -->
+  <div class="page" id="page-mailbox">
+    <div class="header-gradient"><div class="header-row"><h1 style="font-size:18px">✉️ 叙心自语</h1><span onclick="showPage('profile')" style="cursor:pointer">← 返回</span></div></div>
+    <div style="padding:16px">
+      <div style="text-align:center;padding:40px 20px;color:var(--text3)">
+        <div style="font-size:60px;margin-bottom:16px">💌</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px">写下你想说的话</div>
+        <div style="font-size:13px;line-height:1.6">把心事写成信，投入治愈信箱<br>也许某天，会有温暖的回信</div>
+      </div>
+      <textarea class="input" id="mailbox-text" placeholder="亲爱的未来的我..." rows="6" style="margin-bottom:12px"></textarea>
+      <button class="btn btn-primary btn-block" onclick="sendMailbox()">📮 投入信箱</button>
+      <div id="mailbox-history" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <!-- DATA REPORT -->
+  <div class="page" id="page-report">
+    <div class="header-gradient"><div class="header-row"><h1 style="font-size:18px">📈 数据报告</h1><span onclick="showPage('profile')" style="cursor:pointer">← 返回</span></div></div>
+    <div style="padding:16px" id="report-content"></div>
+  </div>
+
+  <!-- VOLUNTEER WORKSPACE -->
+  <div class="page" id="page-volunteer">
+    <div class="header-sunset">
+      <div style="font-size:22px;font-weight:700;color:var(--header-text)">🤝 志愿者工作台</div>
+      <div style="font-size:13px;color:var(--header-sub);margin-top:2px">帮助他人，传递温暖</div>
+    </div>
+    <div style="height:12px;background:linear-gradient(180deg,var(--sunset3),var(--bg))"></div>
+    <div style="padding:16px" id="volunteer-content">
+      <div class="card" style="text-align:center;padding:24px">
+        <div style="font-size:48px;margin-bottom:12px">🤝</div>
+        <h3 style="color:var(--primary);margin-bottom:8px">欢迎回来，志愿者</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.6">你可以在「筑爱故事汇」分享励志故事和经验，<br>也可以在「叙心树洞」帮助需要倾听的人。</p>
+      </div>
+      <div class="card">
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">📋 你的贡献</div>
+        <div id="volunteer-stats"><div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">加载中...</div></div>
+      </div>
+      <div class="card">
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">📝 最近发布</div>
+        <div id="volunteer-recent-posts"><div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">加载中...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUNSELOR CASES -->
+  <div class="page" id="page-counselor">
+    <div class="header-sunset">
+      <div style="font-size:22px;font-weight:700;color:var(--header-text)">💬 案例管理</div>
+      <div style="font-size:13px;color:var(--header-sub);margin-top:2px">专业答疑，用心陪伴</div>
+    </div>
+    <div style="height:12px;background:linear-gradient(180deg,var(--sunset3),var(--bg))"></div>
+    <!-- 子tab切换 -->
+    <div style="display:flex;border-bottom:1px solid var(--border);background:var(--surface)">
+      <div class="tab-item active" id="counselor-tab-cases" onclick="switchCounselorTab(0)" style="flex:1;text-align:center;padding:12px;font-size:14px;cursor:pointer;border-bottom:2.5px solid var(--primary);color:var(--primary);font-weight:600">💬 案例</div>
+      <div class="tab-item" id="counselor-tab-activities" onclick="switchCounselorTab(1)" style="flex:1;text-align:center;padding:12px;font-size:14px;cursor:pointer;border-bottom:2.5px solid transparent;color:var(--text3)">📋 活动</div>
+    </div>
+    <!-- 案例板块 -->
+    <div id="counselor-section-cases">
+      <div style="display:flex;gap:6px;padding:12px 16px">
+        <div class="btn btn-sm" id="counselor-sort-hot" style="background:var(--primary);color:#fff;border:1px solid var(--primary)" onclick="loadCounselorCases('hot')">最热</div>
+        <div class="btn btn-sm" id="counselor-sort-time" style="background:var(--surface);color:var(--text3);border:1px solid var(--border)" onclick="loadCounselorCases('time')">最新</div>
+        <div style="flex:1"></div>
+        <div class="btn btn-sm" id="counselor-filter-pending" style="background:var(--primary);color:#fff;border:1px solid var(--primary)" onclick="loadCounselorCases('hot',true)">待解答</div>
+      </div>
+      <div id="counselor-cases-list" style="padding:0 16px"><div style="color:var(--text3);font-size:13px;text-align:center;padding:40px">加载中...</div></div>
+    </div>
+    <!-- 活动板块 -->
+    <div id="counselor-section-activities" style="display:none">
+      <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:15px;font-weight:700;color:var(--text)">📋 活动管理</div>
+        <div class="btn btn-primary btn-sm" onclick="showCreateActivity()" id="btn-create-activity" style="border-radius:16px">+ 创建活动</div>
+      </div>
+      <div id="counselor-activities-list" style="padding:0 16px"><div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">加载中...</div></div>
+    </div>
+  </div>
+
+  <!-- ACTIVITIES -->
+  <div class="page" id="page-activities">
+    <div class="header-sunset">
+      <div style="font-size:22px;font-weight:700;color:var(--header-text)">📋 活动中心</div>
+      <div style="font-size:13px;color:var(--header-sub);margin-top:2px">发现精彩活动，参与互动</div>
+    </div>
+    <div style="height:12px;background:linear-gradient(180deg,var(--sunset3),var(--bg))"></div>
+    <div style="padding:12px 16px;display:flex;justify-content:flex-end">
+      <div class="btn btn-primary btn-sm" onclick="showCreateActivity()" style="border-radius:16px">+ 创建活动</div>
+    </div>
+    <div id="activities-list" style="padding:0 16px"><div style="color:var(--text3);font-size:13px;text-align:center;padding:40px">加载中...</div></div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal()"><div class="modal" onclick="event.stopPropagation()" id="modal-content"></div></div>
+
+  <!-- BOTTOM NAV -->
+  <!-- Notification Panel -->
+  <div class="notif-panel" id="notif-panel">
+    <div style="background:linear-gradient(135deg,var(--sunset1),var(--sunset2));padding:16px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between">
+      <h2 style="font-size:16px">🔔 消息通知</h2>
+      <span onclick="toggleNotifPanel()" style="cursor:pointer;font-size:20px">✕</span>
+    </div>
+    <div id="notif-list" style="padding:8px 0"><div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">加载中...</div></div>
+  </div>
+
+  <div class="bottom-nav" id="bottom-nav" style="display:none"></div>
+</div>
+
+<script>
+const API=location.origin;
+let deviceId=localStorage.getItem('web_device_id')||('w_'+Math.random().toString(36).substr(2,12));
+localStorage.setItem('web_device_id',deviceId);
+// 清除旧版自动定位缓存（2026-05-11 修复定位准确性后）
+if(!localStorage.getItem('web_city_manual')&&localStorage.getItem('web_weather_city')){
+  localStorage.removeItem('web_weather_city');
+}
+let currentUser=localStorage.getItem('web_user')||'';
+let sessionToken=localStorage.getItem('web_session_token')||'';
+let currentPage='login';
+let regGender='male';
+let regType='user';
+function selectGender(g){
+  regGender=g;
+  var m=document.getElementById('reg-male');
+  var f=document.getElementById('reg-female');
+  if(g==='male'){m.style.background='var(--primary-light)';m.style.borderColor='var(--primary)';f.style.background='';f.style.borderColor='';}
+  else{f.style.background='var(--primary-light)';f.style.borderColor='var(--primary)';m.style.background='';m.style.borderColor='';}
+}
+function selectRegType(t){
+  regType=t;
+  document.getElementById('reg-step1').style.display='none';
+  document.getElementById('reg-step2').style.display='block';
+  var labels={user:'😊 普通用户',volunteer:'🤝 大学生志愿者',counselor:'👨‍⚕️ 心理辅导师'};
+  document.getElementById('reg-type-label').textContent=labels[t]||'';
+  document.getElementById('reg-volunteer-fields').style.display=t==='volunteer'?'block':'none';
+  document.getElementById('reg-counselor-fields').style.display=t==='counselor'?'block':'none';
+}
+function showRegStep1(){
+  document.getElementById('reg-step1').style.display='block';
+  document.getElementById('reg-step2').style.display='none';
+}
+let supportChatMatchId=0,supportChatPolling=null;
+let courseDay=new Date().getDay()===0?6:new Date().getDay()-1;
+const WEEKDAYS=['周一','周二','周三','周四','周五','周六','周日'];
+const COURSE_COLORS=['#81D4FA','#A5D6A7','#F48FB1','#CE93D8','#FFE082','#80CBC4','#FFAB91'];
+const MOODS=[{emoji:'😊',label:'开心',key:'happy'},{emoji:'😢',label:'难过',key:'sad'},{emoji:'😤',label:'生气',key:'angry'},{emoji:'😰',label:'焦虑',key:'anxious'},{emoji:'😌',label:'平静',key:'calm'},{emoji:'🤩',label:'兴奋',key:'excited'},{emoji:'😴',label:'疲惫',key:'tired'},{emoji:'😐',label:'一般',key:'neutral'}];
+const QUOTES=[{text:'生活不是等待暴风雨过去，而是学会在雨中跳舞。',author:'维维安·格林'},{text:'你不必成为别人期望中的样子，做自己就好。',author:'未知'},{text:'每一个不曾起舞的日子，都是对生命的辜负。',author:'尼采'},{text:'温柔半两，从容一生。',author:'三毛'},{text:'你是自己的太阳，无需凭借谁的光。',author:'未知'},{text:'所有的苦难都是化了妆的祝福。',author:'未知'}];
+const AVATARS=['🐱','🐶','🐰','🐻','🦊','🐼','🐮','🐷','🐵','🦁','🐯','🐸'];
+let selectedMoodKey='calm',selectedMoodEmoji='😌',selectedMoodLabel='平静';
+let pet=JSON.parse(localStorage.getItem('web_pet')||'null')||{emoji:'🐱',name:'小喵',level:1,exp:0,mood:80};
+function savePet(){localStorage.setItem('web_pet',JSON.stringify(pet));}
+let pomoDuration=25*60,pomoRemaining=25*60,pomoRunning=false,pomoInterval=null,pomoMode='focus';
+let pomoToday=JSON.parse(localStorage.getItem('web_pomo_today')||'{"count":0,"mins":0,"date":""}');
+if(pomoToday.date!==new Date().toDateString()){pomoToday={count:0,mins:0,date:new Date().toDateString()};localStorage.setItem('web_pomo_today',JSON.stringify(pomoToday));}
+let checkinData=JSON.parse(localStorage.getItem('web_checkin')||'{"streak":0,"lastDate":"","history":[]}');
+let darkMode=localStorage.getItem('web_dark_mode')==='true';
+let mailboxLetters=JSON.parse(localStorage.getItem('web_mailbox')||'[]');
+let profileAvatar=localStorage.getItem('web_profile_avatar')||'😊';
+let profileNickname=localStorage.getItem('web_profile_nickname')||'';
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+async function api(path,opts={}){try{let r;if(opts&&opts.body){const bodyStr=JSON.stringify(opts.body);const h=new Headers();h.set('Content-Type','application/json');if(sessionToken&&currentUser){h.set('X-Session-Token',String(sessionToken).trim());try{h.set('X-Username',encodeURIComponent(String(currentUser).trim()));}catch(e){}}r=await fetch(API+path,{method:opts.method||'POST',headers:h,body:bodyStr});}else{r=await fetch(API+path,{method:opts.method||'GET'});}const data=await r.json();if(data&&data.code==='SESSION_EXPIRED'){sessionToken='';localStorage.removeItem('web_session_token');currentUser='';localStorage.removeItem('web_user');showPage('login');toast('账号已在其他设备登录');}return data;}catch(e){return{error:e.message};}}
+function buildNav(){
+  const ut=localStorage.getItem('web_user_type')||'user';
+  const nav=document.getElementById('bottom-nav');
+  let items=[
+    {icon:'🏠',label:'筑爱故事汇',page:'home'},
+    {icon:'🌸',label:'心晴评测',page:'mood'},
+    {icon:'🫧',label:'叙心树洞',page:'square'}
+  ];
+  if(ut==='volunteer') items.push({icon:'🤝',label:'我的工作',page:'volunteer'});
+  else if(ut==='counselor') items.push({icon:'💬',label:'案例管理',page:'counselor'});
+  items.push({icon:'📚',label:'学习广场',page:'study'});
+  items.push({icon:'👤',label:'我的',page:'profile'});
+  nav.innerHTML=items.map((it,i)=>`<div class="nav-item${i===0?' active':''}" onclick="navTo('${it.page}')"><span class="icon">${it.icon}</span><span class="label">${it.label}</span></div>`).join('');
+}
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('page-'+id);
+  if(pg)pg.classList.add('active');
+  currentPage=id;
+  const noNav=['login','register','ai','support-chat','test-do','mailbox','report'];
+  document.getElementById('bottom-nav').style.display=noNav.includes(id)?'none':'flex';
+  const ut=localStorage.getItem('web_user_type')||'user';
+  let pages=['home','mood','square'];
+  if(ut==='volunteer') pages.push('volunteer');
+  else if(ut==='counselor') pages.push('counselor');
+  pages.push('study','profile');
+  document.querySelectorAll('.nav-item').forEach((n,i)=>{n.classList.toggle('active',pages[i]===id);});
+  if(id==='register') showRegStep1();
+  if(id==='home') loadHome();
+  if(id==='mood') loadMoodPage();
+  if(id==='square') loadSquare('time');
+  if(id==='study') loadStudyPage();
+  if(id==='test') loadTestList();
+  if(id==='profile') loadProfile();
+  if(id==='report') loadDataReport();
+  if(id==='volunteer'){(async()=>{await refreshVerifyStatus();loadVolunteerWorkspace();})();}
+  if(id==='counselor'){(async()=>{await refreshVerifyStatus();loadCounselorCases('hot');})();}
+  if(id==='ai'){loadAIHistory();renderAIHistory();}
+}
+async function refreshVerifyStatus(){
+  if(!currentUser||!sessionToken)return;
+  try{const r=await api('/api/user/validate',{method:'POST',body:{username:currentUser,session_token:sessionToken}});if(r&&r.valid&&r.verify_status){localStorage.setItem('web_verify_status',r.verify_status);}}catch(e){}
+}
+function navTo(id){showPage(id);}
+function openModal(html){document.getElementById('modal-content').innerHTML=html;document.getElementById('modal-overlay').classList.add('show');}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
+function formatTime(t){if(!t)return'';try{const d=new Date(t.replace(' ','T')+(t.includes('Z')?'':'Z'));const diff=(Date.now()-d)/1000;if(diff<60)return'刚刚';if(diff<3600)return Math.floor(diff/60)+'分钟前';if(diff<86400)return Math.floor(diff/3600)+'小时前';return Math.floor(diff/86400)+'天前';}catch(e){return t;}}
+function escapeHtml(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+// Auth
+async function doLogin(){const u=document.getElementById('login-user').value.trim();const p=document.getElementById('login-pass').value.trim();if(!u||!p)return toast('请输入用户名和密码');const r=await api('/api/user/login',{method:'POST',body:{username:u,password:p,platform:'web'}});if(r.error)return toast(r.error);currentUser=u;localStorage.setItem('web_user',u);if(r.session_token){sessionToken=r.session_token;localStorage.setItem('web_session_token',r.session_token);}if(r.nickname){profileNickname=r.nickname;localStorage.setItem('web_profile_nickname',r.nickname);}if(r.gender){localStorage.setItem('web_profile_gender',r.gender);}if(r.avatar){localStorage.setItem('web_profile_avatar',r.avatar);}if(r.user_type){localStorage.setItem('web_user_type',r.user_type);}buildNav();showPage('home');}
+async function doRegister(){const u=document.getElementById('reg-user').value.trim();const p=document.getElementById('reg-pass').value.trim();const n=document.getElementById('reg-nick').value.trim();if(!u||!p)return toast('请输入用户名和密码');const body={username:u,password:p,nickname:n,gender:regGender,platform:'web',user_type:regType};if(regType==='volunteer'){body.university=document.getElementById('reg-university').value.trim();body.student_id=document.getElementById('reg-student-id').value.trim();body.reason=document.getElementById('reg-reason').value.trim();}if(regType==='counselor'){body.real_name=document.getElementById('reg-real-name').value.trim();body.institution=document.getElementById('reg-institution').value.trim();body.license_no=document.getElementById('reg-license-no').value.trim();body.specialization=document.getElementById('reg-specialization').value.trim();}const r=await api('/api/user/register',{method:'POST',body:body});if(r.error)return toast(r.error);if(r.msg)toast(r.msg);currentUser=u;localStorage.setItem('web_user',u);if(r.session_token){sessionToken=r.session_token;localStorage.setItem('web_session_token',r.session_token);}if(r.nickname){profileNickname=r.nickname;localStorage.setItem('web_profile_nickname',r.nickname);}if(r.gender){localStorage.setItem('web_profile_gender',r.gender);}localStorage.setItem('web_user_type',regType);buildNav();showPage('home');}
+function skipLogin(){currentUser='guest_'+deviceId.substr(4,6);buildNav();showPage('home');}
+function doLogout(){localStorage.removeItem('web_user');localStorage.removeItem('web_session_token');localStorage.removeItem('web_user_type');localStorage.removeItem('web_verify_status');currentUser='';sessionToken='';buildNav();showPage('login');}
+
+// 密码找回
+async function showForgotPassword(){
+  const u=document.getElementById('login-user').value.trim();
+  if(!u)return toast('请先输入用户名');
+  const r=await api('/api/user/security/question?username='+encodeURIComponent(u));
+  if(r.error)return toast(r.error);
+  const answer=prompt('安全问题: '+r.question);
+  if(!answer)return;
+  const r2=await api('/api/user/security/verify',{method:'POST',body:{username:u,answer:answer}});
+  if(r2.error)return toast(r2.error);
+  const newPwd=prompt('请输入新密码（至少4位）');
+  if(!newPwd||newPwd.length<4)return toast('密码至少4位');
+  const r3=await api('/api/user/security/reset',{method:'POST',body:{username:u,reset_token:r2.reset_token,new_password:newPwd}});
+  if(r3.error)return toast(r3.error);
+  toast('密码重置成功，请重新登录');
+}
+
+// Home - 筑爱故事汇
+async function loadHome(){
+  loadStories('hot');
+  loadNotifications();
+}
+
+// Mood page
+let emotionTab=0;
+function switchEmotionTab(idx){
+  emotionTab=idx;
+  document.getElementById('mood-content').style.display=idx===0?'block':'none';
+  document.getElementById('test-content').style.display=idx===1?'block':'none';
+  document.getElementById('tab-mood-rec').style.color=idx===0?'var(--primary)':'var(--text3)';
+  document.getElementById('tab-mood-rec').style['border-bottom-color']=idx===0?'var(--primary)':'transparent';
+  document.getElementById('tab-mood-rec').style['font-weight']=idx===0?'700':'400';
+  document.getElementById('tab-mood-test').style.color=idx===1?'var(--primary)':'var(--text3)';
+  document.getElementById('tab-mood-test').style['border-bottom-color']=idx===1?'var(--primary)':'transparent';
+  document.getElementById('tab-mood-test').style['font-weight']=idx===1?'700':'400';
+  if(idx===1){loadTestListOnEmotion();}
+}
+
+async function loadTestListOnEmotion(){
+  document.getElementById('test-list-on-emotion').innerHTML=TESTS.map(t=>'<div class="test-card" onclick="startTest(\''+t.id+'\')"><div class="test-title">'+t.title+'</div><div class="test-desc">'+t.desc+'</div></div>').join('');
+  const h=JSON.parse(localStorage.getItem('web_test_history')||'[]');
+  document.getElementById('test-history-on-emotion').innerHTML=h.length?h.slice().reverse().map(r=>'<div class="history-item"><div class="history-emoji">📋</div><div class="history-info"><div class="history-label">'+escapeHtml(r.title)+'</div><div class="history-time">'+r.time+'</div></div></div>').join(''):'<div style="color:var(--text3);font-size:13px;padding:8px 0">暂无测评记录</div>';
+}
+
+function loadMoodPage(){
+  const dial=document.getElementById('mood-dial');
+  if(dial)updateMoodDial();
+  loadMoodStats();
+  loadMoodHistory();
+}
+
+// Mood dial (8 moods from top going clockwise)
+const DIAL_MOODS=[
+  {key:'happy',emoji:'😊',label:'开心',angle:0},
+  {key:'excited',emoji:'🤩',label:'兴奋',angle:45},
+  {key:'calm',emoji:'😌',label:'平静',angle:90},
+  {key:'neutral',emoji:'😐',label:'一般',angle:135},
+  {key:'tired',emoji:'😴',label:'疲惫',angle:180},
+  {key:'sad',emoji:'😢',label:'难过',angle:225},
+  {key:'anxious',emoji:'😰',label:'焦虑',angle:270},
+  {key:'angry',emoji:'😤',label:'生气',angle:315},
+];
+let moodDialAngle=90; // default to calm (top = 0 deg in CSS, so 90 = top)
+
+function updateMoodDial(){
+  const arrow=document.getElementById('mood-dial-arrow');
+  const emoji=document.getElementById('mood-dial-emoji');
+  const label=document.getElementById('mood-dial-label');
+  if(arrow)arrow.style.transform='translateX(-50%) rotate('+moodDialAngle+'deg)';
+  // Find closest mood
+  let best=null,bestDiff=360;
+  for(const m of DIAL_MOODS){
+    let diff=Math.abs(m.angle-moodDialAngle);
+    if(diff>180)diff=360-diff;
+    if(diff<bestDiff){bestDiff=diff;best=m;}
+  }
+  if(best&&emoji)emoji.textContent=best.emoji;
+  if(best&&label)label.textContent=best.label;
+  selectedMoodKey=best?best.key:'calm';
+  selectedMoodEmoji=best?best.emoji:'😌';
+  selectedMoodLabel=best?best.label:'平静';
+}
+
+function rotateMoodDial(e){
+  const dial=document.getElementById('mood-dial');
+  const rect=dial.getBoundingClientRect();
+  const cx=rect.left+rect.width/2;
+  const cy=rect.top+rect.height/2;
+  const dx=e.clientX-cx;
+  const dy=e.clientY-cy;
+  let angle=Math.atan2(dy,dx)*180/Math.PI+90;
+  if(angle<0)angle+=360;
+  moodDialAngle=Math.round(angle/45)*45%360;
+  updateMoodDial();
+}
+
+function selectMood(key,emoji,label){
+  selectedMoodKey=key;selectedMoodEmoji=emoji;selectedMoodLabel=label;
+}
+
+async function confirmMood(){
+  const note=document.getElementById('mood-note').value.trim();
+  const r=await api('/api/moods',{method:'POST',body:{mood:selectedMoodKey,gender:'male',device_id:deviceId,note:note}});
+  if(r.error){toast(r.error);return;}
+  pet.exp+=15;if(pet.exp>=pet.level*100){pet.level++;pet.exp=0;toast('宠物升级到 Lv.'+pet.level+'! 🎉');}savePet();
+  const msgs=['已记录！'+selectedMoodEmoji+' 今天辛苦啦~','收到！'+selectedMoodEmoji+' 你的心情我记住啦~','记好啦！'+selectedMoodEmoji+' 要天天开心哦~'];
+  toast(msgs[Math.floor(Math.random()*msgs.length)]);
+  document.getElementById('mood-note').value='';
+  await loadMoodStats();await loadMoodHistory();
+}
+
+async function loadMoodStats(){
+  try{const r=await api('/api/moods?device_id='+encodeURIComponent(deviceId));const moods=(r.moods||[]);
+  document.getElementById('mood-stat-count').textContent=moods.length;
+  const days=new Set(moods.map(m=>(m.created_at||'').split(' ')[0])).size;
+  document.getElementById('mood-stat-days').textContent=days;
+  const happy=moods.filter(m=>m.mood==='happy'||m.mood==='excited').length;
+  document.getElementById('mood-stat-happy').textContent=moods.length?Math.round(happy/moods.length*100)+'%':'0%';
+  drawMoodTrend(moods);}catch(e){toast('加载失败:'+e.message);}
+}
+
+function drawMoodTrend(moods){
+  const canvas=document.getElementById('mood-trend-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  // Group by day for last 7 days
+  const moodMap={};
+  const now=new Date();
+  for(let i=6;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const key=d.toISOString().split('T')[0];
+    moodMap[key]={val:0,count:0,label:(d.getMonth()+1)+'/'+d.getDate()};
+  }
+  const moodVals={angry:1,sad:2,anxious:3,calm:4,neutral:5,happy:6,excited:7};
+  moods.forEach(m=>{
+    const key=(m.created_at||'').split(' ')[0];
+    if(moodMap[key]&&moodVals[m.mood]){moodMap[key].val+=moodVals[m.mood];moodMap[key].count++;}
+  });
+  const pts=[];
+  const labels=[];
+  Object.values(moodMap).forEach(v=>{
+    pts.push(v.count>0?(v.val/v.count*100/7):0);
+    labels.push(v.label);
+  });
+  if(pts.every(p=>p===0))return;
+  const padL=40,padR=20,padT=20,padB=30;
+  const cW=W-padL-padR,cH=H-padT-padB;
+  // Grid
+  ctx.strokeStyle='#F0E8E0';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=padT+cH*i/4;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W-padR,y);ctx.stroke();}
+  // Line
+  ctx.strokeStyle='#FF8A9B';ctx.lineWidth=3;ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.beginPath();
+  pts.forEach((p,i)=>{
+    const x=padL+cW*i/(pts.length-1);
+    const y=padT+cH*(1-p/100);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // Fill
+  ctx.fillStyle='rgba(255,138,155,0.1)';
+  ctx.lineTo(padL+cW,padT+cH);ctx.lineTo(padL,padT+cH);ctx.closePath();ctx.fill();
+  // Dots and labels
+  ctx.fillStyle='#FF8A9B';
+  pts.forEach((p,i)=>{
+    const x=padL+cW*i/(pts.length-1);
+    const y=padT+cH*(1-p/100);
+    ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#8D6E63';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText(labels[i],x,H-8);
+    ctx.fillStyle='#FF8A9B';
+  });
+}
+
+async function loadMoodHistory(){
+  const div=document.getElementById('mood-history-list');
+  try{const r=await api('/api/moods?device_id='+encodeURIComponent(deviceId));const moods=r.moods||[];
+  if(!moods.length){div.innerHTML='<div class="empty" style="padding:20px"><div class="icon">🌸</div><div class="text">还没有心情记录~</div></div>';return;}
+  div.innerHTML=moods.slice(0,20).map(m=>{const mood=MOODS.find(x=>x.key===m.mood)||{emoji:'😊',label:m.mood};return'<div class="history-item"><div class="history-emoji">'+mood.emoji+'</div><div class="history-info"><div class="history-label">'+mood.label+'</div><div class="history-time">'+formatTime(m.created_at)+'</div>'+(m.note?'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+escapeHtml(m.note)+'</div>':'')+'</div></div>';}).join('');}catch(e){div.innerHTML='';}
+}
+
+// AI Chat
+let aiHistory=JSON.parse(localStorage.getItem('web_ai_history_'+(currentUser||'_guest'))||'[]');
+function saveAIHistory(){localStorage.setItem('web_ai_history_'+(currentUser||'_guest'),JSON.stringify(aiHistory));}
+function loadAIHistory(){aiHistory=JSON.parse(localStorage.getItem('web_ai_history_'+(currentUser||'_guest'))||'[]');}
+function renderAIHistory(){const div=document.getElementById('ai-messages');if(!div)return;div.innerHTML='';aiHistory.forEach(m=>appendChat('ai-messages',m.content,m.role==='user'));}
+async function sendAI(){const input=document.getElementById('ai-input');const msg=input.value.trim();if(!msg)return;input.value='';appendChat('ai-messages',msg,true);aiHistory.push({role:'user',content:msg});saveAIHistory();try{const r=await api('/api/chat',{method:'POST',body:{message:msg,history:aiHistory,gender:'male'}});const reply=r.reply||r.error||'抱歉，我暂时无法回复';aiHistory.push({role:'assistant',content:reply});saveAIHistory();appendChat('ai-messages',reply,false);}catch(e){appendChat('ai-messages','网络错误，请重试',false);}}
+function appendChat(cid,text,isMe){const div=document.getElementById(cid);const b=document.createElement('div');b.className='chat-bubble '+(isMe?'me':'other');b.textContent=text;div.appendChild(b);div.scrollTop=div.scrollHeight;}
+
+// Square + Support tabs
+let currentSquareTab=0;
+function switchMainTab(idx,el){
+  currentSquareTab=idx;
+  document.querySelectorAll('#page-square .tab-item').forEach(t=>{t.classList.remove('active');t.style.background='';t.style.color='var(--text3)'});
+  el.classList.add('active');el.style.background='#FFE0EC';el.style.color='var(--primary)';
+  document.getElementById('tab-square-content').style.display=idx===0?'block':'none';
+  document.getElementById('tab-support-content').style.display=idx===1?'block':'none';
+  document.querySelector('.fab').style.display='flex';
+  document.querySelector('.fab').onclick=idx===0?showNewPost:showNewCase;
+  if(idx===0)loadSquare('time');if(idx===1)loadCases('hot');
+}
+
+async function loadSquare(sort){
+  document.getElementById('sq-sort-time').style.background=sort==='time'?'var(--primary)':'';document.getElementById('sq-sort-time').style.color=sort==='time'?'#fff':'';document.getElementById('sq-sort-time').style.borderColor=sort==='time'?'var(--primary)':'var(--border)';
+  document.getElementById('sq-sort-hot').style.background=sort==='hot'?'var(--primary)':'';document.getElementById('sq-sort-hot').style.color=sort==='hot'?'#fff':'';document.getElementById('sq-sort-hot').style.borderColor=sort==='hot'?'var(--primary)':'var(--border)';
+  const div=document.getElementById('square-posts');div.innerHTML='<div class="loading">加载中...</div>';
+  try{
+    const r=await api('/api/square/posts?device_id='+deviceId+'&sort='+sort+'&source=treehole');
+    const posts=r.posts||[];
+    // Cache posts
+    if(posts.length){localStorage.setItem('web_posts_'+sort,JSON.stringify(posts));}
+    renderPosts(posts,div);
+  }catch(e){
+    // Fallback to cache
+    const cached=localStorage.getItem('web_posts_'+sort);
+    if(cached){renderPosts(JSON.parse(cached),div);}
+    else{div.innerHTML='<div class="empty">加载失败，请检查网络</div>';}
+  }
+}
+function renderPosts(posts,div){
+  if(!posts.length){div.innerHTML='<div class="empty"><div class="icon">🫧</div><div class="text">还没有帖子~<br>点击右下角发帖吧</div></div>';return;}
+  div.innerHTML=posts.map(p=>{let media='';if(p.media_url){const u=API+p.media_url;if(/\.(mp4|mov|avi|webm)/i.test(p.media_url)){media='<video src="'+u+'" controls style="max-width:100%;border-radius:10px;margin-bottom:8px;max-height:300px"></video>';}else if(/\.(mp3|wav|ogg|m4a|aac)/i.test(p.media_url)){media='<audio src="'+u+'" controls style="width:100%;margin-bottom:8px"></audio>';}else{media='<img src="'+u+'" style="max-width:100%;border-radius:10px;margin-bottom:8px" onclick="window.open(this.src)">';}}return '<div class="post-card"><div class="post-header"><span class="post-author">'+(p.anonymous_name||'匿名')+'</span><span class="post-time">'+formatTime(p.created_at)+'</span></div><div class="post-content">'+escapeHtml(p.content)+'</div>'+media+'<div class="post-actions"><span onclick="likePost('+p.id+')">❤️ '+(p.like_count||0)+'</span><span onclick="showReplies('+p.id+')">💬 '+(p.reply_count||0)+'</span>'+(p.device_id===deviceId?'<span onclick="deletePost('+p.id+')" style="color:var(--red)">删除</span>':'')+'</div></div>';}).join('');
+}
+let selectedFile=null;
+function showNewPost(){
+  // 检查用户类型：只有辅导师和志愿者可以发布帖子
+  const userType=localStorage.getItem('web_user_type')||'user';
+  if(userType==='user'){
+    openModal('<div style="text-align:center;padding:20px">'+
+      '<div style="font-size:40px;margin-bottom:12px">🔒</div>'+
+      '<h3 style="margin-bottom:8px">权限不足</h3>'+
+      '<p style="color:var(--text2);font-size:14px;line-height:1.6">只有辅导师和志愿者才能发布帖子<br>请先申请成为志愿者或辅导师</p>'+
+      '<button class="btn btn-primary" style="margin-top:16px;width:100%" onclick="closeModal()">我知道了</button>'+
+      '</div>');
+    return;
+  }
+  selectedFile=null;
+  openModal('<h3 style="margin-bottom:12px">✏️ 发帖</h3>'+
+    '<textarea class="input" id="new-post-content" placeholder="说点什么..." rows="3"></textarea>'+
+    '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+
+      '<label style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:var(--bg);border-radius:8px;font-size:13px;cursor:pointer">'+
+        '📷 图片<input type="file" accept="image/*" style="display:none" onchange="onFileSelected(this)"></label>'+
+      '<label style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:var(--bg);border-radius:8px;font-size:13px;cursor:pointer">'+
+        '🎬 视频<input type="file" accept="video/*" style="display:none" onchange="onFileSelected(this)"></label>'+
+      '<label style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:var(--bg);border-radius:8px;font-size:13px;cursor:pointer">'+
+        '🎵 音频<input type="file" accept="audio/*" style="display:none" onchange="onFileSelected(this)"></label>'+
+    '</div>'+
+    '<div id="file-preview" style="margin-top:8px;font-size:12px;color:var(--text2)"></div>'+
+    '<div style="display:flex;gap:8px;margin-top:12px">'+
+      '<button class="btn btn-primary" style="flex:1" onclick="submitPost()">发布</button>'+
+      '<button class="btn btn-outline" style="flex:1" onclick="closeModal()">取消</button>'+
+    '</div>');
+}
+function onFileSelected(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>10*1024*1024){toast('文件不能超过10MB');input.value='';return;}
+  selectedFile=file;
+  const type=file.type.startsWith('video')?'🎬':file.type.startsWith('audio')?'🎵':'📷';
+  document.getElementById('file-preview').textContent=type+' '+file.name+' ('+Math.round(file.size/1024)+'KB)';
+}
+async function submitPost(){
+  const c=document.getElementById('new-post-content').value.trim();
+  if(!c&&!selectedFile)return toast('请输入内容或选择文件');
+  let mediaUrl=null;
+  if(selectedFile){
+    toast('上传中...');
+    try{
+      const fd=new FormData();
+      fd.append('file',selectedFile);
+      const resp=await fetch('/api/upload',{method:'POST',body:fd});
+      const result=await resp.json();
+      if(result.url)mediaUrl=result.url;
+      else if(result.error){toast('上传失败: '+result.error);return;}
+    }catch(e){toast('上传出错');return;}
+  }
+  const r=await api('/api/square/posts',{method:'POST',body:{content:c,device_id:deviceId,media_url:mediaUrl,source:'treehole'}});
+  if(r.error)return toast(r.error);
+  closeModal();toast('发布成功');loadSquare('time');
+}
+async function likePost(id){await api('/api/square/posts/'+id+'/like',{method:'POST',body:{device_id:deviceId}});loadSquare('time');}
+async function deletePost(id){if(!confirm('确定删除？'))return;await api('/api/square/posts/'+id,{method:'DELETE',body:{device_id:deviceId}});toast('已删除');loadSquare('time');}
+async function showReplies(postId){const r=await api('/api/square/posts/'+postId+'/replies');const replies=r.replies||[];openModal('<h3 style="margin-bottom:10px">💬 回复</h3><div style="max-height:300px;overflow-y:auto">'+(replies.length?replies.map(rp=>'<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="font-size:12px;color:var(--accent);font-weight:600">'+(rp.anonymous_name||'匿名')+'</div><div style="font-size:14px;margin-top:4px;line-height:1.5">'+escapeHtml(rp.content)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+formatTime(rp.created_at)+'</div></div>').join(''):'<div class="loading">暂无回复</div>')+'</div><div style="display:flex;gap:8px;margin-top:12px"><input class="input" id="reply-input" placeholder="写回复..." style="flex:1"><button class="btn btn-primary btn-sm" onclick="submitReply('+postId+')">回复</button></div>');}
+async function submitReply(postId){const c=document.getElementById('reply-input').value.trim();if(!c)return;await api('/api/square/posts/'+postId+'/replies',{method:'POST',body:{content:c,device_id:deviceId}});toast('回复成功');closeModal();loadSquare('time');}
+
+// ===== 投递树洞 =====
+let caseSort='hot';
+async function loadCases(sort){
+  caseSort=sort;
+  document.getElementById('case-sort-hot').style.background=sort==='hot'?'var(--primary)':'';document.getElementById('case-sort-hot').style.color=sort==='hot'?'#fff':'';document.getElementById('case-sort-hot').style.borderColor=sort==='hot'?'var(--primary)':'var(--border)';
+  document.getElementById('case-sort-time').style.background=sort==='time'?'var(--primary)':'';document.getElementById('case-sort-time').style.color=sort==='time'?'#fff':'';document.getElementById('case-sort-time').style.borderColor=sort==='time'?'var(--primary)':'var(--border)';
+  const div=document.getElementById('treehole-cases');div.innerHTML='<div class="loading">加载中...</div>';
+  try{
+    const r=await fetch('/api/treehole/cases?sort='+sort);const data=await r.json();
+    const cases=data.cases||[];
+    if(!cases.length){div.innerHTML='<div class="empty"><div class="icon">💬</div><div class="text">还没有投递案例~<br>点击右下角投递你的故事</div></div>';return;}
+    div.innerHTML=cases.map(c=>{
+      const typeLabel=c.author_type==='volunteer'?'<span style="display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:#E8F5E9;color:#2E7D32;margin-left:6px">志愿者</span>':c.author_type==='counselor'?'<span style="display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:#E3F2FD;color:#1565C0;margin-left:6px">辅导师</span>':'';
+      const statusLabel=c.status==='answered'?'<span style="display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:#FFF3E0;color:#E65100;margin-left:6px">已解答</span>':'';
+      return '<div class="post-card" onclick="showCaseDetail('+c.id+')" style="cursor:pointer"><div class="post-header"><span class="post-author">匿名'+typeLabel+statusLabel+'</span><span class="post-time">'+formatTime(c.created_at)+'</span></div><div class="post-content">'+escapeHtml(c.content)+'</div><div class="post-actions"><span>❤️ '+c.like_count+'</span><span>💬 '+c.answer_count+' 条解答</span></div></div>';
+    }).join('');
+  }catch(e){div.innerHTML='<div class="empty">加载失败</div>';}
+}
+function showNewCase(){
+  openModal('<h3 style="margin-bottom:12px">📝 投递案例</h3><p style="font-size:13px;color:var(--text2);margin-bottom:12px">描述你的心理困惑，专业辅导师将为你答疑</p><textarea class="input" id="new-case-content" placeholder="说说你的困惑..." style="min-height:100px;margin-bottom:12px"></textarea><div style="display:flex;gap:8px"><button class="btn btn-primary" style="flex:1" onclick="submitCase()">投递</button><button class="btn btn-outline" style="flex:1" onclick="closeModal()">取消</button></div>');
+}
+async function submitCase(){
+  const c=document.getElementById('new-case-content').value.trim();
+  if(!c)return toast('请输入内容');
+  const ut=localStorage.getItem('web_user_type')||'user';
+  const r=await api('/api/treehole/cases',{method:'POST',body:{content:c,device_id:deviceId,username:currentUser||'',author_type:ut}});
+  if(r.error)return toast(r.error);
+  closeModal();toast('投递成功');loadCases(caseSort);
+}
+async function showCaseDetail(caseId){
+  await refreshVerifyStatus();
+  const r=await fetch('/api/treehole/cases/'+caseId+'/answers');const data=await r.json();
+  const answers=data.answers||[];
+  const ut=localStorage.getItem('web_user_type')||'user';
+  let html='<h3 style="margin-bottom:10px">💬 案例详情</h3>';
+  html+='<div style="max-height:40vh;overflow-y:auto;margin-bottom:12px">';
+  if(answers.length){
+    html+=answers.map(a=>{
+      const badge=a.author_type==='counselor'?'<span style="display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:#E3F2FD;color:#1565C0;margin-left:6px">👨‍⚕️ 辅导师</span>':'';
+      return '<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="font-size:12px;color:var(--accent);font-weight:600">'+escapeHtml(a.author_username||'匿名')+badge+'</div><div style="font-size:14px;margin-top:4px;line-height:1.5">'+escapeHtml(a.content)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+formatTime(a.created_at)+'</div></div>';
+    }).join('');
+  }else{html+='<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">暂无解答，等待专业辅导师回复</div>';}
+  html+='</div>';
+  if(ut==='counselor'){
+    const vs=localStorage.getItem('web_verify_status')||'';
+    if(vs==='approved'){
+      html+='<div style="display:flex;gap:8px"><input class="input" id="case-answer-input" placeholder="写下你的专业解答..." style="flex:1"><button class="btn btn-primary btn-sm" onclick="submitCaseAnswer('+caseId+')">回复</button></div>';
+    }else{
+      html+='<div style="text-align:center;padding:12px;color:var(--orange);font-size:13px">⏳ 审核通过后即可回复案例</div>';
+    }
+  }
+  html+='<button class="btn btn-outline btn-block" style="margin-top:12px" onclick="closeModal()">关闭</button>';
+  openModal(html);
+}
+async function submitCaseAnswer(caseId){
+  const c=document.getElementById('case-answer-input').value.trim();
+  if(!c)return toast('请输入回复内容');
+  const r=await api('/api/treehole/cases/'+caseId+'/answers',{method:'POST',body:{content:c,username:currentUser||'',author_type:'counselor'}});
+  if(r.error)return toast(r.error);
+  closeModal();toast('回复成功');loadCases(caseSort);
+}
+
+// ===== 志愿者工作台 =====
+async function loadVolunteerWorkspace(){
+  // 先从服务器获取最新状态
+  await refreshVerifyStatus();
+  const vs=localStorage.getItem('web_verify_status')||'';
+  const content=document.getElementById('volunteer-content');
+  if(vs!=='approved'){
+    content.innerHTML='<div class="card" style="text-align:center;padding:24px"><div style="font-size:48px;margin-bottom:12px">⏳</div><h3 style="color:var(--orange);margin-bottom:8px">等待审核</h3><p style="font-size:13px;color:var(--text2);line-height:1.6">你的志愿者身份正在审核中，<br>审核通过后即可使用工作台功能。</p></div>';
+    return;
+  }
+  const statsDiv=document.getElementById('volunteer-stats');
+  const postsDiv=document.getElementById('volunteer-recent-posts');
+  statsDiv.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px">加载中...</div>';
+  postsDiv.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px">加载中...</div>';
+  try{
+    const [storiesR, treeR, casesR] = await Promise.all([
+      fetch('/api/square/posts?sort=time&device_id='+deviceId),
+      fetch('/api/square/posts?sort=time&source=treehole&device_id='+deviceId),
+      fetch('/api/treehole/cases?sort=time')
+    ]);
+    const stories = await storiesR.json();
+    const tree = await treeR.json();
+    const cases = await casesR.json();
+    const allPosts = (stories.posts||[]).concat(tree.posts||[]);
+    const myPosts = allPosts.filter(p=>p.anonymous_name===currentUser||p.device_id===deviceId);
+    const myCases = (cases.cases||[]).filter(c=>c.author_username===currentUser);
+    statsDiv.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+      '<div style="text-align:center;padding:12px;background:var(--primary-light);border-radius:12px"><div style="font-size:22px;font-weight:700;color:var(--primary)">'+myPosts.length+'</div><div style="font-size:12px;color:var(--text2);margin-top:2px">发帖数</div></div>'+
+      '<div style="text-align:center;padding:12px;background:#FFF3E0;border-radius:12px"><div style="font-size:22px;font-weight:700;color:#E65100">'+myCases.length+'</div><div style="font-size:12px;color:var(--text2);margin-top:2px">投递案例</div></div>'+
+      '</div>';
+    if(!myPosts.length){postsDiv.innerHTML='<div style="text-align:center;color:var(--text3);font-size:13px;padding:16px">暂无发布记录</div>';return;}
+    postsDiv.innerHTML=myPosts.slice(0,10).map(p=>'<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="font-size:14px;line-height:1.5">'+escapeHtml(p.content).substring(0,80)+(p.content.length>80?'...':'')+'</div><div style="font-size:11px;color:var(--text3);margin-top:4px">'+formatTime(p.created_at)+' · ❤️ '+(p.like_count||0)+' · 💬 '+(p.reply_count||0)+'</div></div>').join('');
+  }catch(e){statsDiv.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center">加载失败</div>';}
+}
+
+// ===== 辅导师案例管理 =====
+let counselorSort='hot',counselorPending=false;
+async function loadCounselorCases(sort,pending){
+  if(sort!==undefined)counselorSort=sort;
+  if(pending!==undefined)counselorPending=pending;
+  document.getElementById('counselor-sort-hot').style.background=counselorSort==='hot'?'var(--primary)':'var(--surface)';
+  document.getElementById('counselor-sort-hot').style.color=counselorSort==='hot'?'#fff':'var(--text3)';
+  document.getElementById('counselor-sort-hot').style.borderColor=counselorSort==='hot'?'var(--primary)':'var(--border)';
+  document.getElementById('counselor-sort-time').style.background=counselorSort==='time'?'var(--primary)':'var(--surface)';
+  document.getElementById('counselor-sort-time').style.color=counselorSort==='time'?'#fff':'var(--text3)';
+  document.getElementById('counselor-sort-time').style.borderColor=counselorSort==='time'?'var(--primary)':'var(--border)';
+  document.getElementById('counselor-filter-pending').style.background=counselorPending?'#E65100':'var(--primary)';
+  document.getElementById('counselor-filter-pending').style.color='#fff';
+  const div=document.getElementById('counselor-cases-list');
+  div.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px">加载中...</div>';
+  try{
+    const r=await fetch('/api/treehole/cases?sort='+counselorSort);const data=await r.json();
+    let cases=data.cases||[];
+    if(counselorPending)cases=cases.filter(c=>c.status!=='answered');
+    if(!cases.length){div.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:40px;margin-bottom:8px">📭</div><div>暂无案例</div></div>';return;}
+    div.innerHTML=cases.map(c=>{
+      const statusBadge=c.status==='answered'?'<span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;background:#E8F5E9;color:#2E7D32">已解答</span>':'<span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;background:#FFF3E0;color:#E65100">待解答</span>';
+      const typeBadge=c.author_type==='volunteer'?'<span style="display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:#E8F5E9;color:#2E7D32;margin-left:4px">志愿者</span>':c.author_type==='counselor'?'<span style="display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:#E3F2FD;color:#1565C0;margin-left:4px">辅导师</span>':'';
+      return '<div class="post-card" onclick="showCounselorCaseDetail('+c.id+')" style="cursor:pointer"><div class="post-header"><span class="post-author">匿名'+typeBadge+statusBadge+'</span><span class="post-time">'+formatTime(c.created_at)+'</span></div><div class="post-content">'+escapeHtml(c.content)+'</div><div class="post-actions"><span>❤️ '+c.like_count+'</span><span>💬 '+c.answer_count+' 条解答</span></div></div>';
+    }).join('');
+  }catch(e){div.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">加载失败</div>';}
+}
+async function showCounselorCaseDetail(caseId){
+  const r=await fetch('/api/treehole/cases/'+caseId+'/answers');const data=await r.json();
+  const answers=data.answers||[];
+  let html='<h3 style="margin-bottom:10px">💬 案例详情</h3>';
+  html+='<div style="max-height:50vh;overflow-y:auto;margin-bottom:12px">';
+  if(answers.length){
+    html+=answers.map(a=>{
+      const badge=a.author_type==='counselor'?'<span style="display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:#E3F2FD;color:#1565C0;margin-left:6px">👨‍⚕️ 辅导师</span>':'';
+      return '<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="font-size:12px;color:var(--accent);font-weight:600">'+escapeHtml(a.author_username||'匿名')+badge+'</div><div style="font-size:14px;margin-top:4px;line-height:1.5">'+escapeHtml(a.content)+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+formatTime(a.created_at)+'</div></div>';
+    }).join('');
+  }else{html+='<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">暂无解答</div>';}
+  html+='</div>';
+  const vs=localStorage.getItem('web_verify_status')||'';
+  if(vs==='approved'){
+    html+='<div style="display:flex;gap:8px"><input class="input" id="counselor-answer-input" placeholder="写下你的专业解答..." style="flex:1"><button class="btn btn-primary btn-sm" onclick="submitCounselorAnswer('+caseId+')">回复</button></div>';
+  }else{
+    html+='<div style="text-align:center;padding:12px;color:var(--orange);font-size:13px">⏳ 审核通过后即可回复案例</div>';
+  }
+  html+='<button class="btn btn-outline btn-block" style="margin-top:12px" onclick="closeModal()">关闭</button>';
+  openModal(html);
+}
+async function submitCounselorAnswer(caseId){
+  const c=document.getElementById('counselor-answer-input').value.trim();
+  if(!c)return toast('请输入回复内容');
+  const r=await api('/api/treehole/cases/'+caseId+'/answers',{method:'POST',body:{content:c,username:currentUser||'',author_type:'counselor'}});
+  if(r.error)return toast(r.error);
+  closeModal();toast('回复成功');loadCounselorCases();
+}
+
+// ===== 辅导师活动 =====
+function switchCounselorTab(idx){
+  document.getElementById('counselor-tab-cases').style.borderBottomColor=idx===0?'var(--primary)':'transparent';
+  document.getElementById('counselor-tab-cases').style.color=idx===0?'var(--primary)':'var(--text3)';
+  document.getElementById('counselor-tab-cases').style.fontWeight=idx===0?'600':'normal';
+  document.getElementById('counselor-tab-activities').style.borderBottomColor=idx===1?'var(--primary)':'transparent';
+  document.getElementById('counselor-tab-activities').style.color=idx===1?'var(--primary)':'var(--text3)';
+  document.getElementById('counselor-tab-activities').style.fontWeight=idx===1?'600':'normal';
+  document.getElementById('counselor-section-cases').style.display=idx===0?'block':'none';
+  document.getElementById('counselor-section-activities').style.display=idx===1?'block':'none';
+  if(idx===1)loadActivities();
+}
+async function loadActivities(){
+  const div=document.getElementById('counselor-activities-list')||document.getElementById('activities-list');
+  if(!div)return;
+  const ut=localStorage.getItem('web_user_type')||'user';
+  const createBtn=document.getElementById('btn-create-activity');
+  if(createBtn) createBtn.style.display=ut==='counselor'?'inline-block':'none';
+  div.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">加载中...</div>';
+  try{
+    const r=await fetch('/api/activities?_t='+Date.now());const data=await r.json();
+    const acts=data.activities||[];
+    if(!acts.length){div.innerHTML='<div style="text-align:center;color:var(--text3);font-size:13px;padding:16px">暂无活动</div>';return;}
+    div.innerHTML=acts.map(a=>{
+      const typeTag=a.activity_type==='online'?'<span style="display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:#E3F2FD;color:#1565C0;margin-left:6px">🌐 线上</span>':'<span style="display:inline-block;padding:1px 6px;border-radius:6px;font-size:10px;background:#E8F5E9;color:#2E7D32;margin-left:6px">📍 线下</span>';
+      const loc=a.location?'<div style="font-size:12px;color:var(--text2);margin-top:4px">📍 '+escapeHtml(a.location)+'</div>':'';
+      const time=a.activity_time?'<div style="font-size:12px;color:var(--text2);margin-top:2px">🕐 '+escapeHtml(a.activity_time)+'</div>':'';
+      const isOwner=a.author_username===currentUser;
+      const delBtn=isOwner?'<button class="btn btn-red" style="padding:2px 8px;font-size:11px;margin-left:auto" onclick="event.stopPropagation();deleteActivity('+a.id+')">删除</button>':'';
+      return '<div class="post-card" style="cursor:default"><div class="post-header"><span class="post-author">'+escapeHtml(a.title)+typeTag+'</span><div style="display:flex;align-items:center;gap:6px"><span class="post-time">'+formatTime(a.created_at)+'</span>'+delBtn+'</div></div><div class="post-content">'+escapeHtml(a.content)+'</div>'+loc+time+'<div style="font-size:11px;color:var(--text3);margin-top:4px">by '+escapeHtml(a.author_username||'匿名')+'</div></div>';
+    }).join('');
+  }catch(e){div.innerHTML='<div style="text-align:center;color:var(--text3);font-size:13px;padding:20px">加载失败</div>';}
+}
+function showCreateActivity(){
+  const ut=localStorage.getItem('web_user_type')||'user';
+  if(ut!=='counselor')return toast('只有心理辅导师才能创建活动');
+  openModal('<h3 style="margin-bottom:12px">📋 创建活动</h3>'+
+    '<input class="input" id="act-title" placeholder="活动标题" style="margin-bottom:10px">'+
+    '<textarea class="input" id="act-content" placeholder="活动内容描述" style="min-height:80px;margin-bottom:10px"></textarea>'+
+    '<div style="display:flex;gap:8px;margin-bottom:10px">'+
+      '<div class="btn btn-sm" id="act-type-offline" style="background:var(--primary);color:#fff;border:1px solid var(--primary);flex:1" onclick="setActType(\'offline\')">📍 线下活动</div>'+
+      '<div class="btn btn-sm" id="act-type-online" style="background:var(--surface);color:var(--text3);border:1px solid var(--border);flex:1" onclick="setActType(\'online\')">🌐 线上活动</div>'+
+    '</div>'+
+    '<input class="input" id="act-location" placeholder="活动地点（线下填写）" style="margin-bottom:10px">'+
+    '<input class="input" id="act-time" type="datetime-local" style="margin-bottom:12px">'+
+    '<div style="display:flex;gap:8px"><button class="btn btn-primary" style="flex:1" onclick="submitActivity()">创建</button><button class="btn btn-outline" style="flex:1" onclick="closeModal()">取消</button></div>');
+}
+let newActType='offline';
+function setActType(t){
+  newActType=t;
+  document.getElementById('act-type-offline').style.background=t==='offline'?'var(--primary)':'var(--surface)';
+  document.getElementById('act-type-offline').style.color=t==='offline'?'#fff':'var(--text3)';
+  document.getElementById('act-type-offline').style.borderColor=t==='offline'?'var(--primary)':'var(--border)';
+  document.getElementById('act-type-online').style.background=t==='online'?'var(--primary)':'var(--surface)';
+  document.getElementById('act-type-online').style.color=t==='online'?'#fff':'var(--text3)';
+  document.getElementById('act-type-online').style.borderColor=t==='online'?'var(--primary)':'var(--border)';
+  document.getElementById('act-location').placeholder=t==='online'?'线上链接（选填）':'活动地点';
+}
+async function submitActivity(){
+  const title=document.getElementById('act-title').value.trim();
+  const content=document.getElementById('act-content').value.trim();
+  const location=document.getElementById('act-location').value.trim();
+  const timeVal=document.getElementById('act-time').value;
+  if(!title||!content)return toast('请填写标题和内容');
+  const r=await api('/api/activities',{method:'POST',body:{title:title,content:content,activity_type:newActType,location:location,activity_time:timeVal,username:currentUser||''}});
+  if(r.error)return toast(r.error);
+  closeModal();toast('活动创建成功');loadActivities();
+}
+async function deleteActivity(id){
+  if(!confirm('确定删除该活动？'))return;
+  const r=await api('/api/activities/'+id,{method:'DELETE',body:{username:currentUser||''}});
+  if(r.error)return toast(r.error);
+  toast('已删除');loadActivities();
+}
+
+// Support
+async function loadSupportDiscover(){
+  var div=document.getElementById('support-discover-list');
+  var matchDiv=document.getElementById('support-matches-list');
+  if(div)div.style.display='block';
+  if(matchDiv)matchDiv.style.display='none';
+  if(div)div.innerHTML='<div class="loading">加载中...</div>';
+  try{
+    var r=await fetch('/api/support/discover?device_id='+deviceId+'&_t='+Date.now());
+    var data=await r.json();
+    var users=data.users||[];
+    if(!users.length){if(div)div.innerHTML='<div class="empty"><div class="icon">🌱</div><div class="text">暂无可匹配用户</div></div>';return;}
+    var html='';
+    for(var i=0;i<users.length;i++){
+      var u=users[i];
+      var name=escapeHtml(u.real_name||u.anonymous_name||'用户');
+      var score=u.match_score>0?'<span class="badge badge-pink">匹配 '+u.match_score+'</span>':'';
+      var bio=escapeHtml(u.bio||'这个人很神秘~');
+      var moodTags=(u.mood_tags||[]).map(function(t){return '<span class="tag tag-mood">'+escapeHtml(t)+'</span>';}).join('');
+      var intTags=(u.interest_tags||[]).map(function(t){return '<span class="tag tag-interest">'+escapeHtml(t)+'</span>';}).join('');
+      var did=String(u.device_id).replace(/'/g,"\\'");
+      var isMe=String(u.device_id)===deviceId;
+      var btn=isMe?'<span style="color:var(--text3);font-size:12px">这是你</span>':'<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="doSupportMatch(\''+did+'\')">连接</button>';
+      html+='<div class="user-card"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:600;font-size:15px">'+name+'</div>'+score+'</div><div style="font-size:12px;color:var(--text2);margin-top:4px">'+bio+'</div><div style="margin-top:8px">'+moodTags+intTags+'</div>'+btn+'</div>';
+    }
+    if(div)div.innerHTML=html;
+  }catch(e){if(div)div.innerHTML='<div class="empty">加载失败，请重试</div>';}
+}
+async function loadSupportMatches(){const div=document.getElementById('support-matches-list');div.style.display='block';document.getElementById('support-discover-list').style.display='none';div.innerHTML='<div class="loading">加载中...</div>';const r=await api('/api/support/matches?device_id='+deviceId);const matches=r.matches||[];if(!matches.length){div.innerHTML='<div class="empty"><div class="icon">🤝</div><div class="text">暂无匹配</div></div>';return;}div.innerHTML=matches.map(m=>'<div class="match-card" onclick="openSupportChat('+m.match_id+',\''+escapeHtml(m.partner_name||'用户').replace(/'/g,"\\'")+'\')"><div style="width:42px;height:42px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:18px">🤝</div><div style="flex:1"><div style="font-weight:600;font-size:14px">'+(m.partner_name||'用户')+'</div><div style="font-size:12px;color:var(--text2);margin-top:2px">'+(m.last_message||'开始聊天吧~')+'</div></div><div style="font-size:11px;color:var(--text3)">'+formatTime(m.last_time)+'</div></div>').join('');}
+async function doSupportMatch(tid){const r=await api('/api/support/match',{method:'POST',body:{device_id:deviceId,target_device_id:tid}});if(r.error)return toast(r.error);toast('匹配成功！');}
+
+async function searchSupportUser(){
+  const kw=document.getElementById('support-search-input').value.trim();
+  if(!kw)return toast('请输入搜索内容');
+  const div=document.getElementById('support-discover-list');
+  div.innerHTML='<div class="loading">搜索中...</div>';
+  try{
+    const r=await fetch('/api/support/search?device_id='+deviceId+'&keyword='+encodeURIComponent(kw));
+    const data=await r.json();
+    const users=data.users||[];
+    if(!users.length){div.innerHTML='<div class="empty"><div class="icon">🔍</div><div class="text">未找到该用户</div></div>';return;}
+    div.innerHTML=users.map(function(u){var isMe=String(u.device_id)===deviceId;var btn=isMe?'<span style="color:var(--text3);font-size:12px">这是你</span>':'<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="doSupportMatch(\''+String(u.device_id).replace(/'/g,"\\'")+'\')">连接</button>';return '<div class="user-card"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:600;font-size:15px">'+escapeHtml(u.real_name||u.reg_username||'用户')+'</div>'+(u.match_score>0?'<span class="badge badge-pink">匹配 '+u.match_score+'</span>':'')+'</div><div style="font-size:12px;color:var(--text2);margin-top:4px">'+escapeHtml(u.bio||'这个人很神秘~')+'</div><div style="margin-top:8px">'+(u.mood_tags||[]).map(function(t){return '<span class="tag tag-mood">'+escapeHtml(t)+'</span>';}).join('')+(u.interest_tags||[]).map(function(t){return '<span class="tag tag-interest">'+escapeHtml(t)+'</span>';}).join('')+'</div>'+btn+'</div>';}).join('');
+  }catch(e){div.innerHTML='<div class="empty">搜索失败</div>';}
+}
+function openSupportChat(mid,name){supportChatMatchId=mid;document.getElementById('chat-partner-name').textContent=name;showPage('support-chat');document.getElementById('support-messages').innerHTML='';loadSupportChatMessages();if(supportChatPolling)clearInterval(supportChatPolling);supportChatPolling=setInterval(loadSupportChatMessages,2000);}
+async function loadSupportChatMessages(){if(currentPage!=='support-chat'){clearInterval(supportChatPolling);return;}const r=await api('/api/support/messages?match_id='+supportChatMatchId);const msgs=r.messages||[];const div=document.getElementById('support-messages');if(div.children.length===msgs.length)return;div.innerHTML=msgs.map(m=>{const isMe=m.sender_device_id===deviceId;const readStatus=isMe?'<div style="text-align:right;font-size:10px;color:var(--text3);margin-top:2px">'+(m.is_read?'已读':'未读')+'</div>':'';return '<div class="chat-bubble '+(isMe?'me':'other')+'">'+escapeHtml(m.content)+'</div>'+readStatus;}).join('');div.scrollTop=div.scrollHeight;api('/api/support/messages/read',{method:'POST',body:{match_id:supportChatMatchId,device_id:deviceId}});}
+async function sendSupportMsg(){const input=document.getElementById('support-input');const msg=input.value.trim();if(!msg)return;input.value='';appendChat('support-messages',msg,true);await api('/api/support/messages',{method:'POST',body:{match_id:supportChatMatchId,device_id:deviceId,content:msg}});}
+
+function showTagSetup(){const moods=['焦虑','压力大','低落','孤独','迷茫','想聊聊','失眠','烦躁'];const interests=['学习','运动','音乐','游戏','阅读','电影','旅行','美食','摄影','绘画'];openModal('<h3 style="margin-bottom:12px">🏷️ 设置标签</h3><div style="font-size:13px;color:var(--text2);margin-bottom:8px">当前心情</div><div id="tag-moods">'+moods.map(m=>'<span class="tag tag-mood" onclick="this.classList.toggle(\'selected\')" data-val="'+m+'">'+m+'</span>').join('')+'</div><div style="font-size:13px;color:var(--text2);margin:14px 0 8px">兴趣爱好</div><div id="tag-interests">'+interests.map(m=>'<span class="tag tag-interest" onclick="this.classList.toggle(\'selected\')" data-val="'+m+'">'+m+'</span>').join('')+'</div><button class="btn btn-primary btn-block" style="margin-top:16px" onclick="saveTags()">保存</button>');}
+async function saveTags(){const m=[...document.querySelectorAll('#tag-moods .selected')].map(e=>e.dataset.val);const i=[...document.querySelectorAll('#tag-interests .selected')].map(e=>e.dataset.val);if(!m.length&&!i.length)return toast('请至少选择一个标签');await api('/api/support/profile',{method:'POST',body:{device_id:deviceId,mood_tags:JSON.stringify(m),interest_tags:JSON.stringify(i),bio:''}});closeModal();toast('标签已保存');loadSupportDiscover();}
+
+// Study page - sub-tab switching
+function switchStudyTab(idx,el){
+  document.querySelectorAll('.study-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.study-content').forEach(c=>c.classList.remove('active'));
+  const ids=['study-notes','study-course'];
+  document.getElementById(ids[idx]).classList.add('active');
+  if(idx===0)loadNotes();
+  if(idx===1)renderCourseTabs();
+}
+function loadStudyPage(){loadNotes();}
+
+// Course
+function renderCourseTabs(){document.getElementById('course-tabs').innerHTML=WEEKDAYS.map((w,i)=>'<div class="week-tab '+(i===courseDay?'active':'')+'" onclick="courseDay='+i+';renderCourseTabs()">'+w+'</div>').join('');renderCourses();}
+function renderCourses(){const k='web_courses_'+courseDay;const courses=JSON.parse(localStorage.getItem(k)||'[]');const div=document.getElementById('course-list');if(!courses.length){div.innerHTML='<div class="empty"><div class="icon">📅</div><div class="text">暂无课程</div></div>';return;}div.innerHTML=courses.map((c,i)=>'<div class="course-card"><div class="course-bar" style="background:'+COURSE_COLORS[i%7]+'"></div><div class="course-info"><div class="course-name">'+escapeHtml(c.name)+'</div><div class="course-detail">'+(c.time?escapeHtml(c.time)+' · ':'')+(c.room?escapeHtml(c.room):'')+'</div></div><div style="cursor:pointer;color:var(--text3);font-size:16px;padding:4px" onclick="deleteCourse('+i+')">✕</div></div>').join('');}
+function showAddCourse(){openModal('<h3 style="margin-bottom:12px">添加课程</h3><input class="input" id="add-course-name" placeholder="课程名称" style="margin-bottom:8px"><input class="input" id="add-course-room" placeholder="教室（选填）" style="margin-bottom:8px"><input class="input" id="add-course-time" placeholder="时间（选填，如 第1-2节 08:00）" style="margin-bottom:12px"><button class="btn btn-primary btn-block" onclick="addCourse()">添加</button>');}
+function addCourse(){const n=document.getElementById('add-course-name').value.trim();if(!n)return toast('请输入课程名称');const r=document.getElementById('add-course-room').value.trim();const t=document.getElementById('add-course-time').value.trim();const k='web_courses_'+courseDay;const c=JSON.parse(localStorage.getItem(k)||'[]');c.push({name:n,room:r,time:t});localStorage.setItem(k,JSON.stringify(c));closeModal();renderCourses();toast('已添加');}
+function deleteCourse(i){const k='web_courses_'+courseDay;const c=JSON.parse(localStorage.getItem(k)||'[]');c.splice(i,1);localStorage.setItem(k,JSON.stringify(c));renderCourses();}
+function exportStudyData(){const data={notes:JSON.parse(localStorage.getItem('web_notes')||'[]'),courses:{},pomodoro:pomoToday};for(let i=0;i<7;i++)data.courses[WEEKDAYS[i]]=JSON.parse(localStorage.getItem('web_courses_'+i)||'[]');const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='心屿学习数据_'+new Date().toLocaleDateString('zh-CN')+'.json';a.click();toast('导出成功');}
+async function importCourseFile(input){
+  const file=input.files[0];if(!file)return;
+  toast('正在导入课表...');
+  try{
+    const fd=new FormData();fd.append('file',file);
+    const resp=await fetch('/api/course/import',{method:'POST',body:fd});
+    const r=await resp.json();
+    if(r.error)return toast('导入失败: '+r.error);
+    const courses=r.courses||[];
+    if(!courses.length)return toast('未识别到课程');
+    let added=0;
+    courses.forEach(c=>{
+      const day=c.day;if(day===undefined||day<0||day>6)return;
+      const k='web_courses_'+day;
+      const list=JSON.parse(localStorage.getItem(k)||'[]');
+      list.push({name:c.name||'未知课程',room:c.room||'',time:c.time||''});
+      localStorage.setItem(k,JSON.stringify(list));
+      added++;
+    });
+    renderCourses();
+    toast('成功导入 '+added+' 门课程');
+  }catch(e){toast('导入出错: '+e.message);}
+  input.value='';
+}
+
+// Note
+function loadNotes(){const notes=JSON.parse(localStorage.getItem('web_notes')||'[]');const div=document.getElementById('note-list');if(!notes.length){div.innerHTML='<div class="empty"><div class="icon">📝</div><div class="text">暂无笔记</div></div>';return;}div.innerHTML=notes.map((n,i)=>'<div class="note-card" onclick="editNote('+i+')"><div class="note-title">'+escapeHtml(n.title||'无标题')+'</div><div class="note-preview">'+escapeHtml((n.content||'').substring(0,80))+'</div><div class="note-time">'+(n.time||'')+'</div></div>').join('');}
+function showNewNote(){editNote(-1);}
+function editNote(idx){const notes=JSON.parse(localStorage.getItem('web_notes')||'[]');const n=idx>=0?notes[idx]:{title:'',content:''};openModal('<input class="input" id="note-title" value="'+escapeHtml(n.title||'')+'" placeholder="标题" style="margin-bottom:8px"><textarea class="input" id="note-content" rows="8" placeholder="内容...">'+escapeHtml(n.content||'')+'</textarea><div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-primary" style="flex:1" onclick="saveNote('+idx+')">保存</button>'+(idx>=0?'<button class="btn btn-outline" style="flex:1;color:var(--red);border-color:var(--red)" onclick="deleteNote('+idx+')">删除</button>':'')+'<button class="btn btn-outline" style="flex:1" onclick="closeModal()">取消</button></div>');}
+function saveNote(idx){const t=document.getElementById('note-title').value.trim();const c=document.getElementById('note-content').value.trim();if(!t&&!c)return toast('请输入内容');const notes=JSON.parse(localStorage.getItem('web_notes')||'[]');const now=new Date().toLocaleString('zh-CN');if(idx>=0)notes[idx]={title:t,content:c,time:now};else notes.push({title:t,content:c,time:now});localStorage.setItem('web_notes',JSON.stringify(notes));closeModal();loadNotes();toast('已保存');}
+function deleteNote(idx){if(!confirm('确定删除？'))return;const notes=JSON.parse(localStorage.getItem('web_notes')||'[]');notes.splice(idx,1);localStorage.setItem('web_notes',JSON.stringify(notes));closeModal();loadNotes();}
+
+// Test
+const TESTS=[
+{id:'phq9',title:'PHQ-9 抑郁量表',desc:'9道题，评估过去两周的抑郁症状',count:9,questions:[
+{q:'1. 做事时提不起劲或没有兴趣',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'2. 感到心情低落、沮丧或绝望',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'3. 入睡困难、睡不安稳或睡眠过多',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'4. 感觉疲倦或没有活力',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'5. 食欲不振或吃太多',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'6. 觉得自己很糟或让自己/家人失望',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'7. 注意力难以集中',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'8. 动作或说话速度变得缓慢，或坐立不安',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'9. 有不如死掉或伤害自己的念头',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]}
+]},
+{id:'gad7',title:'GAD-7 焦虑量表',desc:'7道题，评估过去两周的焦虑水平',count:7,questions:[
+{q:'1. 感到紧张、焦虑或急切',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'2. 不能停止或控制担忧',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'3. 对各种各样的事情担忧过多',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'4. 很难放松下来',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'5. 由于不安而无法静坐',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'6. 变得容易烦恼或急躁',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]},
+{q:'7. 感到似乎将有可怕的事情发生',opts:['完全没有','好几天','一半以上的天数','几乎每天'],scores:[0,1,2,3]}
+]},
+{id:'pss',title:'PSS 压力量表',desc:'10道题，评估过去一个月的生活压力',count:10,questions:[
+{q:'1. 因为意想不到的事情而感到心烦意乱',opts:['从不','偶尔','有时','经常','总是'],scores:[0,1,2,3,4]},
+{q:'2. 感到无法控制生活中的重要事情',opts:['从不','偶尔','有时','经常','总是'],scores:[0,1,2,3,4]},
+{q:'3. 感到紧张和压力大',opts:['从不','偶尔','有时','经常','总是'],scores:[0,1,2,3,4]},
+{q:'4. 成功地处理了恼人的生活麻烦',opts:['从不','偶尔','有时','经常','总是'],scores:[4,3,2,1,0]},
+{q:'5. 感到有效地应对了生活中重要的变化',opts:['从不','偶尔','有时','经常','总是'],scores:[4,3,2,1,0]},
+{q:'6. 对自己处理个人问题的能力感到自信',opts:['从不','偶尔','有时','经常','总是'],scores:[4,3,2,1,0]},
+{q:'7. 觉得事情按照你的意愿进行',opts:['从不','偶尔','有时','经常','总是'],scores:[4,3,2,1,0]},
+{q:'8. 发现不能处理所有自己必须做的事情',opts:['从不','偶尔','有时','经常','总是'],scores:[0,1,2,3,4]},
+{q:'9. 能够控制生活中的烦恼',opts:['从不','偶尔','有时','经常','总是'],scores:[4,3,2,1,0]},
+{q:'10. 觉得困难堆积太多而无法克服',opts:['从不','偶尔','有时','经常','总是'],scores:[0,1,2,3,4]}
+]},
+{id:'sleep',title:'睡眠质量评估',desc:'5道题，评估你的睡眠状况',count:5,questions:[
+{q:'1. 入睡困难（超过30分钟）',opts:['几乎没有','偶尔','经常','几乎每天'],scores:[0,1,2,3]},
+{q:'2. 夜间容易醒来',opts:['几乎没有','偶尔','经常','几乎每天'],scores:[0,1,2,3]},
+{q:'3. 早醒后难以再次入睡',opts:['几乎没有','偶尔','经常','几乎每天'],scores:[0,1,2,3]},
+{q:'4. 白天感到疲倦或精力不足',opts:['几乎没有','偶尔','经常','几乎每天'],scores:[0,1,2,3]},
+{q:'5. 睡眠质量让你不满意',opts:['几乎没有','偶尔','经常','几乎每天'],scores:[0,1,2,3]}
+]}
+];
+let testAnswers=[],testCurrentQ=0,currentTestId=null;
+function loadTestList(){document.getElementById('test-list').innerHTML=TESTS.map(t=>'<div class="test-card" onclick="startTest(\''+t.id+'\')"><div class="test-title">'+t.title+'</div><div class="test-desc">'+t.desc+'</div><div style="margin-top:8px"><span class="badge badge-pink">'+t.count+'题</span></div></div>').join('');loadTestHistory();}
+function startTest(id){const test=TESTS.find(t=>t.id===id);if(!test)return;currentTestId=id;testAnswers=new Array(test.questions.length).fill(-1);testCurrentQ=0;document.getElementById('test-title').textContent=test.title;showPage('test-do');renderTestQuestion();}
+function loadTestHistory(){const h=JSON.parse(localStorage.getItem('web_test_history')||'[]');const div=document.getElementById('test-history');if(!h.length){div.innerHTML='<div class="empty" style="padding:12px"><div class="text" style="font-size:13px">暂无测评记录</div></div>';return;}div.innerHTML=h.slice().reverse().map(r=>'<div style="background:var(--surface);border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.04)"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:600;font-size:14px">'+escapeHtml(r.title)+'</div><span class="badge badge-pink">'+r.level+'</span></div><div style="font-size:12px;color:var(--text2);margin-top:4px">得分: '+r.score+' · '+r.time+'</div></div>').join('');}
+function saveTestResult(title,score,level){const h=JSON.parse(localStorage.getItem('web_test_history')||'[]');h.push({title,score,level,time:new Date().toLocaleString('zh-CN')});if(h.length>50)h.splice(0,h.length-50);localStorage.setItem('web_test_history',JSON.stringify(h));}
+function renderTestQuestion(){const test=TESTS.find(t=>t.id===currentTestId);if(!test)return;const q=test.questions[testCurrentQ];const total=test.questions.length;document.getElementById('test-progress').innerHTML='<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px"><span>'+(testCurrentQ+1)+' / '+total+'</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+((testCurrentQ+1)/total*100)+'%"></div></div>';document.getElementById('test-question').innerHTML='<div style="font-size:15px;font-weight:600;margin-bottom:14px;line-height:1.6">'+q.q+'</div>'+q.opts.map((o,i)=>'<div style="padding:13px 16px;border:1.5px solid '+(testAnswers[testCurrentQ]===i?'var(--primary)':'var(--border)')+';border-radius:14px;margin-bottom:8px;cursor:pointer;'+(testAnswers[testCurrentQ]===i?'background:#FFE0EC;font-weight:600':'')+'" onclick="selectTestAnswer('+i+')">'+o+'</div>').join('');document.getElementById('test-prev').disabled=testCurrentQ===0;document.getElementById('test-next').textContent=testCurrentQ===total-1?'提交':'下一题';}
+function selectTestAnswer(i){testAnswers[testCurrentQ]=i;renderTestQuestion();}
+function testPrev(){if(testCurrentQ>0){testCurrentQ--;renderTestQuestion();}}
+function testNext(){const test=TESTS.find(t=>t.id===currentTestId);if(!test)return;if(testAnswers[testCurrentQ]<0)return toast('请先选择答案');if(testCurrentQ<test.questions.length-1){testCurrentQ++;renderTestQuestion();}else{let total=0;test.questions.forEach((q,i)=>{total+=q.scores[testAnswers[i]]||0;});let level='',advice='',report='';if(test.id==='phq9'){if(total<=4){level='无抑郁';advice='你的心理状态良好，继续保持积极的生活方式。';report='PHQ-9得分'+total+'分，属于无抑郁范围。你的情绪状态稳定，生活质量良好。建议继续保持规律的作息、适度的运动和积极的社交。';}else if(total<=9){level='轻度抑郁';advice='建议多进行户外活动，保持规律作息，必要时可寻求心理咨询。';report='PHQ-9得分'+total+'分，属于轻度抑郁范围。你可能近期经历了一些情绪困扰，但程度尚在可控范围。建议：1）每天保证7-8小时睡眠；2）坚持适度运动如散步、慢跑；3）尝试记录心情日记；4）与信任的朋友或家人倾诉。若症状持续两周以上未见改善，建议寻求专业心理咨询师帮助。';}else if(total<=14){level='中度抑郁';advice='建议预约专业心理咨询师进行评估和辅导。';report='PHQ-9得分'+total+'分，属于中度抑郁范围。你正在经历明显的情绪低落和兴趣减退，这可能已影响到日常生活。建议：1）尽快联系专业心理咨询师进行系统评估；2）保持基本的生活规律，即使不想也要强迫自己吃饭和睡眠；3)避免独自面对，给自己建立支持系统；4）在专业指导下考虑进行系统的心理治疗。';}else if(total<=19){level='中重度抑郁';advice='强烈建议尽快就医或寻求专业心理治疗。';report='PHQ-9得分'+total+'分，属于中重度抑郁范围。你正在经历严重的情绪困扰，可能出现明显的功能损害。建议：1）立即寻求精神科医生或心理咨询师的帮助；2）如有自伤想法，请立即联系紧急求助热线；3）让可信赖的人陪伴你直到得到专业帮助；4）不要试图独自应对。';}else{level='重度抑郁';advice='请立即寻求专业心理援助，必要时前往医院就诊。';report='PHQ-9得分'+total+'分，属于重度抑郁范围。这需要立即引起重视。你可能正在经历严重的情绪危机。请：1）立即拨打心理援助热线（如12320）；2）联系家人和朋友陪伴；3）如有自伤念头，请立即就医；4）不要独自面对，这是一个可以克服的难关。';}}else if(test.id==='gad7'){if(total<=4){level='无焦虑';advice='你的焦虑水平正常，继续保持~';report='GAD-7得分'+total+'分，属于无焦虑范围。你的情绪状态平稳，能够正常应对生活中的挑战。建议保持当前的健康生活方式。';}else if(total<=9){level='轻度焦虑';advice='可以学习一些放松技巧，如深呼吸、正念冥想等。';report='GAD-7得分'+total+'分，属于轻度焦虑范围。你可能对某些事情存在过度担忧，但总体可控。建议：1）练习深呼吸（4-7-8呼吸法）；2）尝试正念冥想每天5-10分钟；3）减少咖啡因摄入；4）记录让你焦虑的事情并分析其实际可能性；若焦虑持续一个月以上，建议咨询专业心理咨询师。';}else if(total<=14){level='中度焦虑';advice='建议寻求专业帮助，学习系统的焦虑管理技巧。';report='GAD-7得分'+total+'分，属于中度焦虑范围。你的焦虑症状已开始影响生活质量，可能出现睡眠问题或注意力难以集中。建议：1）考虑寻求专业心理咨询师的帮助；2）学习系统的放松训练和认知重构技巧；3）建立规律的运动习惯；4）减少对焦虑源的信息搜索（如反复刷新闻）。';}else{level='重度焦虑';advice='建议立即寻求专业心理援助，必要时可配合药物治疗。';report='GAD-7得分'+total+'分，属于重度焦虑范围。你正在经历严重的焦虑困扰，可能伴随身体症状（如心慌、出汗、肌肉紧张等）。建议：1）立即寻求精神科或心理咨询专业帮助；2）可能需要配合药物治疗，请咨询医生；3）避免独自面对，让身边的人了解你的状况；4）暂时远离给自己带来压力的环境。';}}else if(test.id==='pss'){if(total<=13){level='低压力';advice='你的压力水平较低，继续保持良好状态~';report='PSS得分'+total+'分，属于低压力范围。你能够较好地应对生活中的压力源，情绪调节能力良好。建议继续保持当前的作息规律和压力管理方式。';}else if(total<=26){level='中等压力';advice='注意适当放松和休息，调整不切实际的期望。';report='PSS得分'+total+'分，属于中等压力范围。你正在承受一定程度的压力，可能出现睡眠质量下降或情绪波动。建议：1）识别主要压力源并尝试调整；2）每天给自己留出15-30分钟的放松时间；3）尝试用写日记的方式梳理压力来源；4）保持规律运动有助于缓解压力；5）学会说"不"，拒绝超负荷的任务。';}else{level='高压力';advice='压力较大，建议寻求支持并学习压力管理技巧。';report='PSS得分'+total+'分，属于高压力范围。你正在承受较大的生活压力，这可能严重影响身心健康。建议：1）系统学习压力管理技巧（可寻求心理咨询师帮助）；2）审视自己的生活目标是否过于不切实际；3）建立强大的社会支持系统；4）考虑暂时放下一些非必要的任务；5）关注睡眠、运动和饮食，这些是压力应对的基础；6）如果压力严重影响到日常生活，请寻求专业帮助。';}}else{if(total<=4){level='睡眠良好';advice='你的睡眠质量很好，继续保持~';report='睡眠质量评估得分'+total+'分，属于睡眠良好范围。你的睡眠模式健康，白天的精力和情绪状态良好。建议继续保持良好的睡眠习惯，如固定作息时间、营造舒适的睡眠环境等。';}else if(total<=9){level='轻度睡眠问题';advice='建议改善睡眠习惯，如减少睡前屏幕使用，保持规律作息。';report='睡眠质量评估得分'+total+'分，属于轻度睡眠问题范围。你可能有轻微的入睡困难或夜间易醒，但总体睡眠尚可。建议：1）睡前1小时减少手机、电脑等屏幕使用；2）固定睡觉和起床时间；3）下午避免摄入咖啡因；4）营造凉爽、黑暗、安静的睡眠环境；5）避免在床上做与睡眠无关的事情。';}else if(total<=14){level='中度睡眠问题';advice='建议咨询睡眠专科或心理咨询师，系统改善睡眠。';report='睡眠质量评估得分'+total+'分，属于中度睡眠问题范围。你的睡眠问题已经开始影响到白天的功能和生活质量。建议：1）考虑咨询睡眠专科或心理咨询师；2）可以尝试认知行为疗法改善睡眠（CBT-I）；3）记录睡眠日记帮助识别问题模式；4）避免使用酒精或非处方安眠药来自行解决；5）检查是否存在甲状腺问题或睡眠呼吸暂停等躯体原因。';}else{level='严重睡眠问题';advice='建议立即就医，进行全面评估和专业治疗。';report='睡眠质量评估得分'+total+'分，属于严重睡眠问题范围。你的睡眠状况可能已经严重影响到身心健康和日常功能。建议：1）立即就医进行详细评估；2）可能需要睡眠监测来明确原因（如睡眠呼吸暂停）；3）在专业指导下进行系统治疗；4）避免长期自行服用安眠药；5）请家人朋友关注你的状况，睡眠严重不良时不应独自应对。';}}saveTestResult(test.title,total,level);openModal('<div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:12px">📊</div><h2 style="color:var(--primary)">'+level+'</h2><div style="font-size:13px;color:var(--text2);margin-top:8px">原始得分: '+total+'</div><div style="font-size:13px;margin-top:12px;padding:14px;background:#f8f4ff;border-radius:12px;line-height:1.6;text-align:left">'+report+'</div><p style="font-size:11px;color:var(--text3);margin-top:14px;line-height:1.6">本测评仅供参考，不构成医学诊断。如有需要请咨询专业心理工作者。</p><button class="btn btn-primary btn-block" style="margin-top:16px" onclick="closeModal();showPage(\'test\')">返回</button></div>');}}
+
+// Comprehensive Report
+function showComprehensiveReport(){
+  const h=JSON.parse(localStorage.getItem('web_test_history')||'[]');
+  if(!h.length){toast('请先完成至少一份测评');return;}
+  const phq=h.find(x=>x.title&&x.title.includes('PHQ'));
+  const gad=h.find(x=>x.title&&x.title.includes('GAD'));
+  const pss=h.find(x=>x.title&&x.title.includes('PSS'));
+  const sleep=h.find(x=>x.title&&x.title.includes('睡眠'));
+  const scores={phq:phq?phq.score:null,gad:gad?gad.score:null,pss:pss?pss.score:null,sleep:sleep?sleep.score:null};
+  const desc=getScoreDescription(scores);
+  const overallLevel=desc.overall;
+  const recommendations=desc.recommendations;
+  let badges='';
+  if(phq)badges+='<span class="badge badge-pink" style="margin:3px">PHQ-9: '+getPHQLevel(phq.score)+'</span>';
+  if(gad)badges+='<span class="badge badge-blue" style="margin:3px">GAD-7: '+getGADLevel(gad.score)+'</span>';
+  if(pss)badges+='<span class="badge badge-green" style="margin:3px">PSS: '+getPSSLevel(pss.score)+'</span>';
+  if(sleep)badges+='<span class="badge badge-pink" style="margin:3px">睡眠: '+getSleepLevel(sleep.score)+'</span>';
+  openModal('<div style="padding:16px;max-height:70vh;overflow-y:auto;text-align:left"><h2 style="color:var(--primary);text-align:center;margin-bottom:12px;font-size:18px">🧠 综合心理分析报告</h2><div style="text-align:center;margin-bottom:14px"><span style="font-size:28px">'+desc.emoji+'</span><div style="font-size:16px;font-weight:700;margin-top:6px">'+overallLevel+'</div></div><div style="font-size:13px;background:#f8f4ff;border-radius:12px;padding:14px;margin-bottom:12px;line-height:1.7">'+desc.summary+'</div><div style="margin-bottom:12px"><div style="font-weight:700;font-size:14px;margin-bottom:8px">已完成测评：</div>'+(badges||'<span style="color:var(--text3);font-size:13px">暂无记录</span>')+'</div><div style="margin-bottom:12px"><div style="font-weight:700;font-size:14px;margin-bottom:8px">📋 各维度详解：</div><div style="background:var(--surface);border-radius:12px;padding:12px;margin-bottom:8px">'+getDimensionDetail(scores)+'</div></div><div style="margin-bottom:12px"><div style="font-weight:700;font-size:14px;margin-bottom:8px">💡 综合建议：</div><div style="background:#FFF9C4;border-radius:12px;padding:12px;font-size:13px;line-height:1.7">'+recommendations+'</div></div><div style="font-size:11px;color:var(--text3);padding:8px;text-align:center;line-height:1.5">报告生成时间：'+new Date().toLocaleString('zh-CN')+'<br>本报告仅供参考，不构成医学诊断</div></div><button class="btn btn-primary btn-block" style="margin-top:8px" onclick="closeModal()">关闭</button>');
+}
+function getScoreDescription(scores){
+  const {phq,gad,pss,sleep}=scores;
+  let validCount=Object.values(scores).filter(v=>v!==null).length;
+  if(validCount===0)return{overall:'数据不足',emoji:'📋',summary:'暂无足够测评数据',recommendations:'请完成至少一份测评后查看综合报告'};
+  let risk=0;let details=[];
+  if(phq!==null){if(phq>9)risk+=2;else if(phq>4)risk+=1;}
+  if(gad!==null){if(gad>9)risk+=2;else if(gad>4)risk+=1;}
+  if(pss!==null){if(pss>26)risk+=2;else if(pss>13)risk+=1;}
+  if(sleep!==null){if(sleep>9)risk+=2;else if(sleep>4)risk+=1;}
+  if(risk<=0)return{overall:'心理健康状态良好',emoji:'🌟',summary:'你的各项心理指标均在正常范围内，整体心理健康状态良好。建议继续保持积极的生活方式，包括规律运动、充足睡眠和良好的人际支持系统。',recommendations:'继续保持当前的健康习惯。规律作息（每天7-8小时睡眠）、每周3-5次有氧运动（如快走、跑步、游泳）、保持社交活动和兴趣爱好。定期进行心理测评以监测状态。'};
+  if(risk<=3)return{overall:'存在轻度心理困扰',emoji:'🌤️',summary:'你正在经历一定程度的心理困扰，主要表现为情绪波动或压力感增强。这在大学生中较为常见，通常与学业压力、人际关系或生活变化相关。建议优先处理最突出的问题。',recommendations:'1）每日进行5-10分钟深呼吸放松练习；2）保持规律作息，避免熬夜；3）适当增加户外活动时间；4）尝试写日记记录情绪；5）与信任的朋友或家人交流。如症状持续2周以上未见改善，建议预约心理咨询师。'};
+  if(risk<=6)return{overall:'存在中度心理困扰',emoji:'⛅',summary:'你的心理困扰指标达到中等水平，可能已影响到日常生活功能（如睡眠、学习效率、社交等）。建议认真对待并采取积极措施。',recommendations:'建议：1）尽快预约校内心理咨询中心或专业心理咨询师；2）建立规律的生活作息，确保充足睡眠；3）减少不必要的压力源，尝试暂时放下非紧急任务；4）保持基本的社会连接，即使不想也要维持与家人朋友的联系；5）每天记录心情变化和触发因素；6）如果出现睡眠严重问题或消极念头，请立即寻求专业帮助。'};
+  return{overall:'心理困扰较重',emoji:'⚠️',summary:'你的多项心理指标显示正在经历较重的心理困扰，可能已严重影响日常生活功能。建议寻求专业帮助。',recommendations:'强烈建议：1）立即联系专业心理咨询师或精神科医生；2）如有自伤念头，请立即拨打心理援助热线（如12320）；3）让可信赖的人陪伴身边；4）避免独处，确保有人知道你的状况；5）不要试图独自应对，这不是一个能靠意志力解决的困难；6）在专业指导下进行系统治疗。记住：寻求帮助是强大的表现。'};
+}
+function getDimensionDetail(scores){
+  let html='';
+  const {phq,gad,pss,sleep}=scores;
+  if(phq!==null)html+='<div style="margin-bottom:8px"><b>PHQ-9 抑郁：</b>'+phq+'分 → '+getPHQLevel(phq)+'</div>';
+  else html+='<div style="margin-bottom:8px;color:var(--text3)"><b>PHQ-9 抑郁：</b>未测评</div>';
+  if(gad!==null)html+='<div style="margin-bottom:8px"><b>GAD-7 焦虑：</b>'+gad+'分 → '+getGADLevel(gad)+'</div>';
+  else html+='<div style="margin-bottom:8px;color:var(--text3)"><b>GAD-7 焦虑：</b>未测评</div>';
+  if(pss!==null)html+='<div style="margin-bottom:8px"><b>PSS 压力：</b>'+pss+'分 → '+getPSSLevel(pss)+'</div>';
+  else html+='<div style="margin-bottom:8px;color:var(--text3)"><b>PSS 压力：</b>未测评</div>';
+  if(sleep!==null)html+='<div style="margin-bottom:8px"><b>睡眠质量：</b>'+sleep+'分 → '+getSleepLevel(sleep)+'</div>';
+  else html+='<div style="color:var(--text3)"><b>睡眠质量：</b>未测评</div>';
+  return html;
+}
+function getPHQLevel(s){if(s<=4)return'正常';if(s<=9)return'轻度';if(s<=14)return'中度';if(s<=19)return'中重度';return'重度';}
+function getGADLevel(s){if(s<=4)return'正常';if(s<=9)return'轻度';if(s<=14)return'中度';return'重度';}
+function getPSSLevel(s){if(s<=13)return'低压力';if(s<=26)return'中等';return'高压力';}
+function getSleepLevel(s){if(s<=4)return'良好';if(s<=9)return'轻度问题';if(s<=14)return'中度问题';return'严重问题';}
+
+// Pomodoro
+function setPomoMode(mins){pomoDuration=mins*60;pomoRemaining=mins*60;pomoRunning=false;if(pomoInterval)clearInterval(pomoInterval);pomoInterval=null;document.getElementById('pomo-start').textContent='开始';document.getElementById('pomo-time').textContent=String(mins).padStart(2,'0')+':00';document.getElementById('pomo-label').textContent=mins===25?'专注时间':mins===5?'短休时间':'长休时间';['pomo-tab-1','pomo-tab-2','pomo-tab-3'].forEach((id,i)=>{const el=document.getElementById(id);const active=(mins===25&&i===0)||(mins===5&&i===1)||(mins===15&&i===2);el.style.background=active?'var(--primary)':'';el.style.color=active?'#fff':'';el.style.borderColor=active?'var(--primary)':'var(--border)';});pomoMode=mins===25?'focus':'break';}
+function togglePomodoro(){if(pomoRunning){pomoRunning=false;clearInterval(pomoInterval);pomoInterval=null;document.getElementById('pomo-start').textContent='继续';return;}pomoRunning=true;document.getElementById('pomo-start').textContent='暂停';pomoInterval=setInterval(()=>{pomoRemaining--;const m=Math.floor(pomoRemaining/60),s=pomoRemaining%60;document.getElementById('pomo-time').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');if(pomoRemaining<=0){clearInterval(pomoInterval);pomoRunning=false;if(pomoMode==='focus'){pomoToday.count++;pomoToday.mins+=pomoDuration/60;localStorage.setItem('web_pomo_today',JSON.stringify(pomoToday));document.getElementById('pomo-today-count').textContent=pomoToday.count;document.getElementById('pomo-today-mins').textContent=pomoToday.mins;toast('番茄完成！🍅 休息一下吧');setPomoMode(5);}else{toast('休息结束，继续加油！💪');setPomoMode(25);}}},1000);}
+function resetPomodoro(){pomoRunning=false;if(pomoInterval)clearInterval(pomoInterval);pomoInterval=null;document.getElementById('pomo-start').textContent='开始';setPomoMode(pomoDuration/60);}
+
+// Pet
+function showPetDialog(){const mt=pet.mood>=80?'超级开心':pet.mood>=50?'心情不错':pet.mood>=20?'有点低落':'心情很差';openModal('<div style="text-align:center;padding:10px"><div style="font-size:64px">'+pet.emoji+'</div><div style="font-size:18px;font-weight:700;margin-top:8px">'+pet.name+'</div><div style="font-size:13px;color:var(--text2);margin-top:4px">Lv.'+pet.level+' · '+mt+'</div><div style="margin:16px 0"><div class="progress-bar" style="margin:0 20px"><div class="progress-fill" style="width:'+((pet.exp/(pet.level*100))*100)+'%"></div></div><div style="font-size:11px;color:var(--text3);margin-top:4px">距离下一级还需 '+(pet.level*100-pet.exp)+' 经验</div></div><div style="display:flex;gap:12px;margin-top:16px"><button class="btn btn-primary" style="flex:1" onclick="feedPet()">🍙 喂食</button><button class="btn btn-outline" style="flex:1" onclick="playPet()">🎾 互动</button></div></div>');}
+function feedPet(){pet.exp+=10;if(pet.exp>=pet.level*100){pet.level++;pet.exp=0;toast(pet.name+'升级了！🎉');}savePet();toast(pet.name+'吃得很开心~ +10经验');closeModal();loadHome();}
+function playPet(){pet.exp+=10;if(pet.exp>=pet.level*100){pet.level++;pet.exp=0;toast(pet.name+'升级了！🎉');}savePet();toast(pet.name+'玩得很开心~ +10经验');closeModal();loadHome();}
+
+// Weather
+async function showWeather(){const city=prompt('输入城市名称：',localStorage.getItem('web_weather_city')||'北京');if(!city)return;localStorage.setItem('web_weather_city',city);localStorage.setItem('web_city_manual','1');openModal('<div class="loading">获取天气中...</div>');const r=await api('/api/weather?city='+encodeURIComponent(city));if(r.temp){openModal('<h3 style="margin-bottom:12px">'+r.icon+' 今日天气</h3><div style="text-align:center;padding:20px"><div style="font-size:48px">'+r.icon+'</div><div style="font-size:36px;font-weight:700;color:var(--primary);margin-top:8px">'+r.temp+'</div><div style="font-size:14px;color:var(--text2);margin-top:4px">'+r.desc+'</div><div style="font-size:13px;color:var(--text2);margin-top:4px">'+r.detail+'</div><div style="font-size:12px;color:var(--text3);margin-top:8px">'+r.city+'</div></div><button class="btn btn-outline btn-block" onclick="closeModal()">关闭</button>');}else{openModal('<div class="empty"><div class="icon">🌤</div><div class="text">'+(r.error||'暂无天气数据')+'</div></div><button class="btn btn-outline btn-block" style="margin-top:12px" onclick="closeModal()">关闭</button>');}}
+
+// Helplines
+function showHelplines(){openModal('<h3 style="margin-bottom:12px">📞 心理援助热线</h3><div style="line-height:2.2;font-size:13px"><div style="padding:10px;background:#f8f4ff;border-radius:12px;margin-bottom:8px"><b>12320</b> 心理援助热线</div><div style="padding:10px;background:#f8f4ff;border-radius:12px;margin-bottom:8px"><b>400-161-9995</b> 心理危机干预热线</div><div style="padding:10px;background:#f8f4ff;border-radius:12px;margin-bottom:8px"><b>400-821-1215</b> 生命热线</div><div style="padding:10px;background:#f8f4ff;border-radius:12px"><b>110 / 120</b> 紧急电话</div></div><button class="btn btn-outline btn-block" style="margin-top:12px" onclick="closeModal()">关闭</button>');}
+
+// Profile
+function loadProfile(){
+  document.getElementById('profile-avatar').textContent=profileAvatar;
+  document.getElementById('profile-name').textContent=profileNickname||currentUser||'未登录';
+  document.getElementById('profile-id').textContent='ID: '+deviceId;
+  if(currentUser){document.getElementById('login-icon').textContent='🚪';document.getElementById('login-label').textContent='退出登录';document.getElementById('login-label').style.color='var(--red)';}
+  else{document.getElementById('login-icon').textContent='🔑';document.getElementById('login-label').textContent='登录';document.getElementById('login-label').style.color='var(--primary)';}
+  // 显示用户类型标签
+  const badge=document.getElementById('profile-type-badge');
+  const ut=localStorage.getItem('web_user_type')||'user';
+  const vs=localStorage.getItem('web_verify_status')||'';
+  if(ut==='volunteer'){
+    badge.style.display='block';
+    const vStatus=vs==='approved'?' ✅已通过':vs==='rejected'?' ❌已拒绝':vs==='pending'?' ⏳审核中':'';
+    badge.innerHTML='<span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;background:#E8F5E9;color:#2E7D32">🤝 大学生志愿者'+vStatus+'</span>';
+  }else if(ut==='counselor'){
+    badge.style.display='block';
+    const cStatus=vs==='approved'?' ✅已通过':vs==='rejected'?' ❌已拒绝':vs==='pending'?' ⏳审核中':'';
+    badge.innerHTML='<span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;background:#E3F2FD;color:#1565C0">👨‍⚕️ 认证心理辅导师'+cStatus+'</span>';
+  }else{
+    badge.style.display='none';
+  }
+  document.getElementById('dark-mode-toggle').checked=darkMode;
+}
+function showEditProfile(){openModal('<h3 style="margin-bottom:12px">编辑资料</h3><div style="font-size:13px;color:var(--text2);margin-bottom:8px">选择头像</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px" id="avatar-grid">'+AVATARS.map(a=>'<div style="padding:10px;text-align:center;font-size:28px;border-radius:12px;border:2px solid '+(a===profileAvatar?'var(--primary)':'var(--border)')+';cursor:pointer" onclick="pickAvatar(\''+a+'\')">'+a+'</div>').join('')+'</div><input class="input" id="edit-nickname" value="'+escapeHtml(profileNickname)+'" placeholder="昵称" style="margin-bottom:10px"><input class="input" id="edit-age" type="number" placeholder="年龄（选填）" style="margin-bottom:10px"><select class="input" id="edit-role" style="margin-bottom:10px;padding:12px 16px"><option value="">身份（选填）</option><option value="student">学生</option><option value="parent">家长</option><option value="other">其他</option></select><input class="input" id="edit-region" placeholder="地区（选填）" style="margin-bottom:10px"><textarea class="input" id="edit-bio" placeholder="个人信息（选填，隐私保护）" style="min-height:60px;margin-bottom:12px"></textarea><button class="btn btn-primary btn-block" onclick="saveProfile()">保存</button>');}
+function pickAvatar(a){profileAvatar=a;localStorage.setItem('web_profile_avatar',a);document.getElementById('profile-avatar').textContent=a;document.querySelectorAll('#avatar-grid div').forEach(el=>{el.style.borderColor=el.textContent.trim()===a?'var(--primary)':'var(--border)';});}
+async function saveProfile(){const n=document.getElementById('edit-nickname').value.trim();const age=document.getElementById('edit-age').value;const role=document.getElementById('edit-role').value;const region=document.getElementById('edit-region').value.trim();const bio=document.getElementById('edit-bio').value.trim();profileNickname=n;localStorage.setItem('web_profile_nickname',n);if(currentUser){await api('/api/user/update',{method:'POST',body:{username:currentUser,nickname:n,age:age?parseInt(age):0,role:role,region:region,bio:bio}});}closeModal();loadProfile();toast('资料已保存');}
+function showSetSecurityQuestion(){
+  if(!currentUser)return toast('请先登录');
+  openModal('<h3 style="margin-bottom:12px">设置安全问题</h3><p style="font-size:12px;color:var(--text2);margin-bottom:12px">用于找回密码，请牢记答案</p><input class="input" id="sec-question" placeholder="例如：我的小学名字是？" style="margin-bottom:10px"><input class="input" id="sec-answer" placeholder="答案" style="margin-bottom:12px"><button class="btn btn-primary btn-block" onclick="saveSecurityQuestion()">保存</button>');
+}
+async function saveSecurityQuestion(){
+  const q=document.getElementById('sec-question').value.trim();
+  const a=document.getElementById('sec-answer').value.trim();
+  if(!q||!a)return toast('请填写完整');
+  const r=await api('/api/user/security/set',{method:'POST',body:{username:currentUser,question:q,answer:a}});
+  if(r.error)return toast(r.error);
+  closeModal();toast('安全问题已设置');
+}
+
+// 紧急联系人
+async function showEmergencyContacts(){
+  if(!currentUser)return toast('请先登录');
+  const r=await api('/api/emergency/contacts?username='+encodeURIComponent(currentUser));
+  const contacts=r.contacts||[];
+  let html='<h3 style="margin-bottom:12px">紧急联系人</h3>';
+  if(contacts.length===0){
+    html+='<p style="color:var(--text2);font-size:13px;margin-bottom:12px">还没有添加联系人</p>';
+  }else{
+    contacts.forEach(c=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--input-bg);border-radius:10px;margin-bottom:8px"><div><div style="font-weight:600">'+escapeHtml(c.name)+'</div><div style="font-size:12px;color:var(--text2)">'+escapeHtml(c.phone)+' · '+escapeHtml(c.relation||'')+'</div></div><button class="btn" style="font-size:12px;padding:4px 12px;color:#e74c3c" onclick="deleteEmergencyContact('+c.id+')">删除</button></div>';
+    });
+  }
+  html+='<button class="btn btn-primary btn-block" style="margin-top:8px" onclick="showAddContactForm()">+ 添加联系人</button>';
+  openModal(html);
+}
+function showAddContactForm(){
+  openModal('<h3 style="margin-bottom:12px">添加紧急联系人</h3><input class="input" id="ec-name" placeholder="姓名" style="margin-bottom:10px"><input class="input" id="ec-phone" placeholder="电话号码" style="margin-bottom:10px"><input class="input" id="ec-relation" placeholder="关系（如：家人、朋友）" style="margin-bottom:12px"><button class="btn btn-primary btn-block" onclick="addEmergencyContact()">添加</button><button class="btn btn-block" style="margin-top:8px" onclick="showEmergencyContacts()">返回</button>');
+}
+async function addEmergencyContact(){
+  const name=document.getElementById('ec-name').value.trim();
+  const phone=document.getElementById('ec-phone').value.trim();
+  const relation=document.getElementById('ec-relation').value.trim();
+  if(!name||!phone)return toast('姓名和电话不能为空');
+  const r=await api('/api/emergency/contacts',{method:'POST',body:{username:currentUser,name:name,phone:phone,relation:relation}});
+  if(r.error)return toast(r.error);
+  toast('联系人已添加');
+  showEmergencyContacts();
+}
+async function deleteEmergencyContact(id){
+  if(!confirm('确定删除此联系人？'))return;
+  const r=await api('/api/emergency/contacts/delete',{method:'POST',body:{username:currentUser,id:id}});
+  if(r.error)return toast(r.error);
+  toast('联系人已删除');
+  showEmergencyContacts();
+}
+
+// Dark mode
+function toggleDarkMode(){darkMode=!darkMode;applyDarkMode(darkMode);}
+function applyDarkMode(on){darkMode=on;localStorage.setItem('web_dark_mode',on);document.getElementById('dark-mode-toggle').checked=on;const r=document.documentElement;if(on){r.style.setProperty('--bg','#1a1a2e');r.style.setProperty('--surface','#16213e');r.style.setProperty('--text','#e0e0e0');r.style.setProperty('--text2','#aaa');r.style.setProperty('--text3','#777');r.style.setProperty('--border','#2a2a4a');r.style.setProperty('--card-bg','#1e2a4a');r.style.setProperty('--card-shadow','rgba(0,0,0,.3)');r.style.setProperty('--input-bg','#0f1729');r.style.setProperty('--active-bg','#2a3a5a');r.style.setProperty('--header-text','#e0e0e0');r.style.setProperty('--header-sub','#aaa');r.style.setProperty('--profile-bg','#1a1a2e');r.style.setProperty('--unread-bg','#2a1a2e');r.style.setProperty('--badge-bg','#1a2a3e');r.style.setProperty('--badge-text','#64b5f6');r.style.setProperty('--progress-bg','#2a2a4a');document.body.style.background='#1a1a2e';}else{r.style.setProperty('--bg','#FFF8F0');r.style.setProperty('--surface','#FFFFFF');r.style.setProperty('--text','#333');r.style.setProperty('--text2','#999');r.style.setProperty('--text3','#B0A89E');r.style.setProperty('--border','#F0EBE5');r.style.setProperty('--card-bg','#FFFFFF');r.style.setProperty('--card-shadow','rgba(0,0,0,.06)');r.style.setProperty('--input-bg','#fff');r.style.setProperty('--active-bg','#f5f0eb');r.style.setProperty('--header-text','#6D4C41');r.style.setProperty('--header-sub','#8D6E63');r.style.setProperty('--profile-bg','#FFF0F3');r.style.setProperty('--unread-bg','#FFF5F7');r.style.setProperty('--badge-bg','#E3F2FD');r.style.setProperty('--badge-text','#2196F3');r.style.setProperty('--progress-bg','#f0f0f0');document.body.style.background='#FFF8F0';}}
+
+// Daily Checkin
+function doCheckin(){
+  const today=new Date().toISOString().split('T')[0];
+  if(checkinData.lastDate===today)return toast('今天已经打卡啦~ ✅');
+  const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];
+  if(checkinData.lastDate===yesterday){checkinData.streak++;}
+  else{checkinData.streak=1;}
+  checkinData.lastDate=today;
+  checkinData.history.push(today);
+  localStorage.setItem('web_checkin',JSON.stringify(checkinData));
+  pet.exp+=20;if(pet.exp>=pet.level*100){pet.level++;pet.exp=0;}savePet();
+  const msgs=['打卡成功！连续'+checkinData.streak+'天 🎉','太棒了！已经连续'+checkinData.streak+'天啦~ 💪','打卡完成！坚持就是胜利 ✨'];
+  if(checkinData.streak===7)msgs.push('🎉 坚持一周了！太厉害了！');
+  if(checkinData.streak===14)msgs.push('🌟 两周打卡达成！你真的很棒！');
+  if(checkinData.streak===30)msgs.push('🏆 一个月不间断！你是真正的勇者！');
+  toast(msgs[Math.floor(Math.random()*msgs.length)]);
+  document.getElementById('profile-checkin-streak').textContent='连续 '+checkinData.streak+' 天';
+}
+
+function showMailbox(){showPage('mailbox');loadMailboxHistory();}
+function showDataReport(){showPage('report');loadDataReport();}
+
+// Mailbox
+function sendMailbox(){const text=document.getElementById('mailbox-text').value.trim();if(!text)return toast('请输入内容');mailboxLetters.unshift({content:text,time:new Date().toLocaleString('zh-CN')});localStorage.setItem('web_mailbox',JSON.stringify(mailboxLetters));document.getElementById('mailbox-text').value='';toast('信件已投入信箱 📮');loadMailboxHistory();}
+function loadMailboxHistory(){const div=document.getElementById('mailbox-history');if(!mailboxLetters.length){div.innerHTML='';return;}div.innerHTML='<div style="font-size:14px;font-weight:600;margin-bottom:8px">📮 信箱里的信</div>'+mailboxLetters.slice(0,10).map(l=>'<div style="padding:12px;background:#f8f4ff;border-radius:12px;margin-bottom:8px"><div style="font-size:13px;line-height:1.6">'+escapeHtml(l.content)+'</div><div style="font-size:11px;color:var(--text3);margin-top:6px">'+l.time+'</div></div>').join('');}
+
+// Data Report
+function loadDataReport(){
+  const div=document.getElementById('report-content');
+  api('/api/moods?device_id='+encodeURIComponent(deviceId)).then(r=>{
+    const moods=r.moods||[];
+    const notes=JSON.parse(localStorage.getItem('web_notes')||'[]');
+    const days=new Set(moods.map(m=>(m.created_at||'').split(' ')[0])).size;
+    const happy=moods.filter(m=>m.mood==='happy'||m.mood==='excited').length;
+    const happyRate=moods.length?Math.round(happy/moods.length*100):0;
+    let courses=0;for(let i=0;i<7;i++)courses+=JSON.parse(localStorage.getItem('web_courses_'+i)||'[]').length;
+    div.innerHTML=`
+      <div style="text-align:center;padding:20px 0"><div style="font-size:40px;margin-bottom:8px">📊</div><div style="font-size:18px;font-weight:700">我的数据概览</div></div>
+      <div class="stats-row"><div class="stat-card"><div class="stat-num">${moods.length}</div><div class="stat-label">心情记录</div></div><div class="stat-card"><div class="stat-num">${days}</div><div class="stat-label">活跃天数</div></div><div class="stat-card"><div class="stat-num">${happyRate}%</div><div class="stat-label">开心率</div></div></div>
+      <div class="stats-row"><div class="stat-card"><div class="stat-num">${notes.length}</div><div class="stat-label">笔记数</div></div><div class="stat-card"><div class="stat-num">${courses}</div><div class="stat-label">课程数</div></div><div class="stat-card"><div class="stat-num" style="color:var(--green)">${checkinData.streak}</div><div class="stat-label">连续打卡</div></div></div>
+      <div style="margin-top:16px;padding:16px;background:var(--surface);border-radius:16px;box-shadow:0 1px 6px rgba(0,0,0,.04)">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px">📋 心情分布</div>
+        ${MOODS.map(m=>{const count=moods.filter(x=>x.mood===m.key).length;const pct=moods.length?Math.round(count/moods.length*100):0;return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px;width:28px">${m.emoji}</span><span style="width:40px;font-size:12px">${m.label}</span><div style="flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--primary);border-radius:4px"></div></div><span style="font-size:12px;color:var(--text2);width:36px;text-align:right">${count}</span></div>`;}).join('')}
+      </div>
+      <div style="text-align:center;padding:16px;font-size:12px;color:var(--text3)">数据仅供参考，帮助你更好地了解自己</div>
+    `;
+  });
+}
+
+// Init
+if(darkMode)applyDarkMode(true);
+if(currentUser&&sessionToken){
+  // 验证session是否有效
+  api('/api/user/validate',{method:'POST',body:{username:currentUser,session_token:sessionToken}}).then(function(r){
+    if(r&&r.valid){
+      if(r.user_type)localStorage.setItem('web_user_type',r.user_type);
+      if(r.verify_status)localStorage.setItem('web_verify_status',r.verify_status);
+      buildNav();showPage('home');
+    }
+    else{sessionToken='';localStorage.removeItem('web_session_token');currentUser='';localStorage.removeItem('web_user');showPage('login');toast('账号已在其他设备登录，请重新登录');}
+  }).catch(function(){buildNav();showPage('home');});
+}else if(currentUser){
+  buildNav();showPage('home');
+}else{
+  showPage('login');
+}
+
+// ===== Notifications =====
+async function loadNotifications(){
+  if(!deviceId)return;
+  try{
+    const r=await fetch('/api/square/notifications?device_id='+deviceId);
+    const data=await r.json();
+    const badge=document.getElementById('notif-badge');
+    if(data.unread>0){badge.textContent=data.unread>99?'99+':data.unread;badge.style.display='flex';}
+    else{badge.style.display='none';}
+    const list=document.getElementById('notif-list');
+    if(!data.notifications||!data.notifications.length){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">暂无通知</div>';return;}
+    list.innerHTML=data.notifications.map(n=>'<div class="notif-item '+(n.is_read?'':'unread')+'"><div class="notif-from">'+escapeHtml(n.from_anonymous_name||'匿名')+'</div><div class="notif-text">'+escapeHtml(n.post_content||'')+(n.reply_content?'<br>回复: '+escapeHtml(n.reply_content):'')+'</div><div class="notif-time">'+n.created_at+'</div></div>').join('');
+  }catch(e){}
+}
+function toggleNotifPanel(){
+  const panel=document.getElementById('notif-panel');
+  panel.classList.toggle('open');
+  if(panel.classList.contains('open')){loadNotifications();fetch('/api/square/notifications/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({device_id:deviceId})}).then(()=>{document.getElementById('notif-badge').style.display='none';});}
+}
+
+// ===== 筑爱故事汇 =====
+let storySort='hot',storyTag='',storySearch='';
+function loadStories(sort){
+  storySort=sort||storySort;
+  const hotEl=document.getElementById('story-sort-hot');
+  const timeEl=document.getElementById('story-sort-time');
+  if(sort==='hot'){
+    hotEl.style.background='linear-gradient(135deg,#FF6B8A,#FF8E9E)';hotEl.style.color='#fff';hotEl.style.boxShadow='0 3px 10px rgba(255,107,138,.25)';
+    timeEl.style.background='#fff';timeEl.style.color='#999';timeEl.style.boxShadow='none';
+  }else{
+    timeEl.style.background='linear-gradient(135deg,#FF6B8A,#FF8E9E)';timeEl.style.color='#fff';timeEl.style.boxShadow='0 3px 10px rgba(255,107,138,.25)';
+    hotEl.style.background='#fff';hotEl.style.color='#999';hotEl.style.boxShadow='none';
+  }
+  let url='/api/square/posts?sort='+storySort+'&device_id='+deviceId+'&source=story';
+  if(storyTag)url+='&tag='+encodeURIComponent(storyTag);
+  if(storySearch)url+='&search='+encodeURIComponent(storySearch);
+  fetch(url).then(r=>r.json()).then(data=>{
+    const list=document.getElementById('story-list');
+    if(!data.posts||!data.posts.length){list.innerHTML='<div style="text-align:center;padding:60px 20px"><div style="font-size:64px;margin-bottom:16px">📝</div><div style="font-size:15px;color:var(--text2);line-height:1.8">暂无故事，来发布第一个吧~</div><div style="margin-top:20px"><button class="btn btn-primary" style="border-radius:20px;padding:10px 28px;background:linear-gradient(135deg,#FF6B8A,#FF8E9E)" onclick="showNewStory()">✏️ 发布故事</button></div></div>';return;}
+    list.innerHTML=data.posts.map(p=>{
+      const tags=Array.isArray(p.tags)?p.tags:[];
+      const tagHtml=tags.map(t=>'<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;background:#E8EAF6;color:var(--accent);margin-right:4px">'+escapeHtml(t)+'</span>').join('');
+      const time=p.created_at?new Date(p.created_at*1000).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+      const isVideo=p.media_url&&(p.media_url.endsWith('.mp4')||p.media_url.endsWith('.mov')||p.media_url.endsWith('.avi'));
+      let mediaHtml='';
+      if(p.media_url){
+        if(isVideo){mediaHtml='<video src="'+p.media_url+'" controls style="width:100%;border-radius:12px;margin-top:8px;max-height:240px"></video>';}
+        else{mediaHtml='<img src="'+p.media_url+'" style="width:100%;border-radius:12px;margin-top:8px;max-height:240px;object-fit:cover">';}
+      }
+      return '<div class="post-card"><div class="post-header"><span class="post-author">'+escapeHtml(p.anonymous_name||'匿名')+'</span><span class="post-time">🕐 '+time+'</span></div><div class="post-content">'+escapeHtml(p.content||'')+'</div>'+mediaHtml+(tagHtml?'<div style="margin-top:6px">'+tagHtml+'</div>':'')+'<div class="post-actions"><span onclick="likeStory('+p.id+',this)">'+(p.liked?'❤️':'🤍')+' <b>'+p.like_count+'</b></span><span onclick="showStoryComments('+p.id+')">💬 '+p.reply_count+'</span></div></div>';
+    }).join('');
+  });
+}
+function searchStories(){storySearch=document.getElementById('story-search-input').value;loadStories(storySort);}
+function filterStoryTag(tag){storyTag=tag;loadStories(storySort);}
+function likeStory(pid,el){
+  fetch('/api/square/posts/'+pid+'/like',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({device_id:deviceId})}).then(r=>r.json()).then(r=>{
+    if(r.ok){el.innerHTML=(r.liked?'❤️':'🤍')+' <b>'+r.like_count+'</b>';}
+  });
+}
+function showStoryComments(pid){
+  openModal('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="font-size:16px">💬 评论留言</h3><span onclick="closeModal()" style="cursor:pointer;font-size:20px">✕</span></div><div id="story-comments-'+pid+'" style="max-height:50vh;overflow-y:auto;margin-bottom:12px"><div class="loading">加载中...</div></div><div style="display:flex;gap:8px"><input id="story-comment-input-'+pid+'" class="input" placeholder="写评论..." style="flex:1"><button class="btn btn-primary btn-sm" onclick="postStoryComment('+pid+')">发送</button></div>');
+  fetch('/api/square/posts/'+pid+'/replies').then(r=>r.json()).then(data=>{
+    const div=document.getElementById('story-comments-'+pid);
+    if(!data.replies||!data.replies.length){div.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">暂无评论</div>';return;}
+    div.innerHTML=data.replies.map(r=>'<div style="padding:8px 0;border-bottom:1px solid var(--border)"><div style="font-size:12px;font-weight:600;color:var(--accent)">'+escapeHtml(r.anonymous_name||'匿名')+'</div><div style="font-size:13px;margin-top:4px">'+escapeHtml(r.content)+'</div></div>').join('');
+  });
+}
+function postStoryComment(pid){
+  const input=document.getElementById('story-comment-input-'+pid);
+  const content=input.value.trim();
+  if(!content)return;
+  fetch('/api/square/posts/'+pid+'/replies',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:content,device_id:deviceId})}).then(r=>r.json()).then(r=>{
+    if(r.ok){input.value='';toast('评论成功');showStoryComments(pid);}
+    else{toast(r.error||'评论失败');}
+  });
+}
+function showNewStory(){
+  const ut=localStorage.getItem('web_user_type')||'user';
+  const canMedia=ut==='volunteer'||ut==='counselor';
+  let mediaHtml='';
+  if(canMedia){
+    mediaHtml='<div style="margin-bottom:8px"><label style="font-size:13px;color:var(--text2)">添加媒体：</label><input type="file" id="new-story-file" accept="image/*,video/*" style="font-size:12px;margin-top:4px"></div>';
+  }else{
+    mediaHtml='<div style="margin-bottom:8px;padding:8px 12px;background:var(--bg);border-radius:10px;font-size:12px;color:var(--text2)">📌 普通用户仅可发布文字内容<br>如需上传视频/音频，请申请成为志愿者或辅导师</div>';
+  }
+  openModal('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="font-size:16px">✏️ 发布故事</h3><span onclick="closeModal()" style="cursor:pointer;font-size:20px">✕</span></div><textarea id="new-story-content" class="input" placeholder="分享你的故事..." style="min-height:100px;margin-bottom:8px"></textarea>'+mediaHtml+'<div style="margin-bottom:12px"><label style="font-size:13px;color:var(--text2)">标签：</label><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"><span class="tag" style="background:#E8EAF6;color:var(--accent);font-size:12px" onclick="this.classList.toggle(\'selected\')" data-tag="励志">励志</span><span class="tag" style="background:#E8F5E9;color:var(--green);font-size:12px" onclick="this.classList.toggle(\'selected\')" data-tag="温暖">温暖</span><span class="tag" style="background:#FFF3E0;color:#E65100;font-size:12px" onclick="this.classList.toggle(\'selected\')" data-tag="成长">成长</span><span class="tag" style="background:#F3E5F5;color:#7B1FA2;font-size:12px" onclick="this.classList.toggle(\'selected\')" data-tag="感悟">感悟</span><span class="tag" style="background:#E1F5FE;color:#0277BD;font-size:12px" onclick="this.classList.toggle(\'selected\')" data-tag="日常">日常</span></div></div><button class="btn btn-primary btn-block" onclick="submitNewStory()">发布</button>');
+}
+async function submitNewStory(){
+  const content=document.getElementById('new-story-content').value.trim();
+  const fileInput=document.getElementById('new-story-file');
+  const tags=Array.from(document.querySelectorAll('.modal .tag.selected')).map(t=>t.dataset.tag);
+  const ut=localStorage.getItem('web_user_type')||'user';
+  const hasFile=fileInput&&fileInput.files&&fileInput.files.length;
+  if(!content&&!hasFile){toast('请输入内容');return;}
+  if(hasFile&&ut==='user'){toast('普通用户无法上传媒体，请申请成为志愿者或辅导师');return;}
+  let media_url='';
+  if(hasFile){
+    const fd=new FormData();fd.append('file',fileInput.files[0]);
+    const ur=await fetch('/api/upload',{method:'POST',body:fd}).then(r=>r.json());
+    if(ur.ok)media_url=ur.url;else{toast('上传失败');return;}
+  }
+  fetch('/api/square/posts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:content,device_id:deviceId,media_url:media_url,tags:tags,username:currentUser||'',source:'story'})}).then(r=>r.json()).then(r=>{
+    if(r.ok){closeModal();toast('发布成功');loadStories(storySort);}
+    else{toast(r.error||'发布失败');}
+  });
+}
+
+// ===== AI情绪评估 =====
+function showAIEmotionAssess(){
+  openModal('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="font-size:16px">🤖 AI情绪评估</h3><span onclick="closeModal()" style="cursor:pointer;font-size:20px">✕</span></div><p style="font-size:13px;color:var(--text2);margin-bottom:12px">描述你当前的情绪状态，AI将为你进行专业评估分析</p><textarea id="ai-emotion-desc" class="input" placeholder="例如：最近考试压力很大，经常失眠，感到焦虑不安..." style="min-height:100px;margin-bottom:12px"></textarea><div id="ai-emotion-result" style="display:none;background:var(--bg);border-radius:12px;padding:14px;margin-bottom:12px;font-size:13px;line-height:1.7;white-space:pre-wrap;max-height:40vh;overflow-y:auto"></div><button class="btn btn-primary btn-block" id="ai-emotion-btn" onclick="doAIEmotionAssess()">开始评估</button>');
+}
+async function doAIEmotionAssess(){
+  const desc=document.getElementById('ai-emotion-desc').value.trim();
+  if(!desc){toast('请先描述你的情绪');return;}
+  const btn=document.getElementById('ai-emotion-btn');
+  btn.disabled=true;btn.textContent='评估中...';
+  const result=document.getElementById('ai-emotion-result');
+  result.style.display='block';result.textContent='正在分析中，请稍候...';
+  try{
+    const r=await fetch('/api/ai-emotion-assess',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:desc,device_id:deviceId})});
+    const data=await r.json();
+    result.textContent=data.assessment||'评估完成';
+  }catch(e){result.textContent='评估失败，请稍后重试';}
+  btn.disabled=false;btn.textContent='重新评估';
+}
+
+// ===== 活动和课程预约 =====
+function showEventsList(){
+  openModal('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="font-size:16px">🎫 线下活动预约</h3><span onclick="closeModal()" style="cursor:pointer;font-size:20px">✕</span></div><div id="events-list-content"><div class="loading">加载中...</div></div>');
+  fetch('/api/events').then(r=>r.json()).then(data=>{
+    const div=document.getElementById('events-list-content');
+    if(!data.events||!data.events.length){div.innerHTML='<div class="empty"><div class="text">暂无活动</div></div>';return;}
+    div.innerHTML=data.events.map(e=>{
+      const pct=Math.round(e.booked/e.capacity*100);
+      return '<div style="background:var(--surface);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,.04)"><div style="display:flex;justify-content:space-between;align-items:start"><div><div style="font-size:15px;font-weight:600">'+escapeHtml(e.title)+'</div><div style="font-size:12px;color:var(--text2);margin-top:4px">'+escapeHtml(e.desc)+'</div><div style="font-size:11px;color:var(--text3);margin-top:4px">📍 '+escapeHtml(e.location)+' · '+e.time+'</div></div></div><div style="margin-top:8px"><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px"><span>已预约 '+e.booked+'/'+e.capacity+'</span><button class="btn btn-primary btn-sm" style="padding:4px 12px;font-size:11px" onclick="bookEvent('+e.id+')">预约</button></div></div></div>';
+    }).join('');
+  });
+}
+function showClassesList(){
+  openModal('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="font-size:16px">💻 线上课堂预约</h3><span onclick="closeModal()" style="cursor:pointer;font-size:20px">✕</span></div><div id="classes-list-content"><div class="loading">加载中...</div></div>');
+  fetch('/api/classes').then(r=>r.json()).then(data=>{
+    const div=document.getElementById('classes-list-content');
+    if(!data.classes||!data.classes.length){div.innerHTML='<div class="empty"><div class="text">暂无课程</div></div>';return;}
+    div.innerHTML=data.classes.map(c=>{
+      const pct=Math.round(c.booked/c.capacity*100);
+      return '<div style="background:var(--surface);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,.04)"><div style="display:flex;justify-content:space-between;align-items:start"><div><div style="font-size:15px;font-weight:600">'+escapeHtml(c.title)+'</div><div style="font-size:12px;color:var(--text2);margin-top:4px">'+escapeHtml(c.desc)+'</div><div style="font-size:11px;color:var(--text3);margin-top:4px">📅 '+c.schedule+' · '+c.duration+'</div></div></div><div style="margin-top:8px"><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px"><span>已报名 '+c.booked+'/'+c.capacity+'</span><button class="btn btn-primary btn-sm" style="padding:4px 12px;font-size:11px" onclick="bookClass('+c.id+')">报名</button></div></div></div>';
+    }).join('');
+  });
+}
+function bookEvent(eid){
+  fetch('/api/events/'+eid+'/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({device_id:deviceId})}).then(r=>r.json()).then(r=>{
+    toast(r.message||r.error||'操作完成');
+  });
+}
+function bookClass(cid){
+  fetch('/api/classes/'+cid+'/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({device_id:deviceId})}).then(r=>r.json()).then(r=>{
+    toast(r.message||r.error||'操作完成');
+  });
+}
+
+// ===== 志愿者申请 =====
+function showVolunteerApply(){
+  openModal('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="font-size:16px">🤝 申请为志愿者</h3><span onclick="closeModal()" style="cursor:pointer;font-size:20px">✕</span></div><p style="font-size:13px;color:var(--text2);margin-bottom:12px">加入心屿志愿者团队，帮助更多需要的人</p><textarea id="volunteer-reason" class="input" placeholder="为什么想成为志愿者？" style="min-height:80px;margin-bottom:8px"></textarea><input id="volunteer-skills" class="input" placeholder="你的特长或技能（选填）" style="margin-bottom:12px"><div id="volunteer-status-msg" style="display:none;padding:10px;border-radius:10px;margin-bottom:12px;font-size:13px"></div><button class="btn btn-primary btn-block" onclick="submitVolunteerApply()">提交申请</button>');
+  // Check existing status
+  if(currentUser){
+    fetch('/api/volunteer/status?username='+currentUser).then(r=>r.json()).then(r=>{
+      const msg=document.getElementById('volunteer-status-msg');
+      if(r.status==='pending'){msg.style.display='block';msg.style.background='#FFF3E0';msg.style.color='#E65100';msg.textContent='您的申请正在审核中...';}
+      else if(r.status==='approved'){msg.style.display='block';msg.style.background='#E8F5E9';msg.style.color='var(--green)';msg.textContent='您已是志愿者！';}
+    });
+  }
+}
+function submitVolunteerApply(){
+  const reason=document.getElementById('volunteer-reason').value.trim();
+  const skills=document.getElementById('volunteer-skills').value.trim();
+  if(!currentUser){toast('请先登录');return;}
+  if(!reason){toast('请填写申请理由');return;}
+  fetch('/api/volunteer/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser,reason:reason,skills:skills})}).then(r=>r.json()).then(r=>{
+    if(r.ok){toast('申请已提交，等待审核');closeModal();}
+    else{toast(r.error||'提交失败');}
+  });
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary: soft pink -->
+    <color name="primary">#FF8A9B</color>
+    <color name="primary_dark">#E8707F</color>
+    <color name="primary_light">#FFF0F3</color>
+    <color name="accent">#B39DDB</color>
+    <color name="female_primary">#F48FB1</color>
+    <color name="female_primary_dark">#EC407A</color>
+    <color name="female_primary_light">#FCE4EC</color>
+
+    <!-- Background: warm pink -->
+    <color name="background">#FFF0F0</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#4A3728</color>
+    <color name="text_secondary">#8D7B68</color>
+    <color name="text_hint">#C4B5A8</color>
+    <color name="divider">#F0E6DC</color>
+    <color name="card_bg">#FFFAF5</color>
+
+    <!-- Semantic colors -->
+    <color name="success">#81C784</color>
+    <color name="warning">#FFB74D</color>
+    <color name="danger">#EF9A9A</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="tab_inactive">#C4B5A8</color>
+
+    <!-- Card accent colors -->
+    <color name="quote_bg">#FFF8E1</color>
+    <color name="help_bg">#FFF0F3</color>
+    <color name="help_border">#F8BBD0</color>
+    <color name="help_text">#C2185B</color>
+
+    <!-- Gradient colors -->
+    <color name="gradient_start">#FF8A9B</color>
+    <color name="gradient_end">#FFB6C1</color>
+
+    <!-- Cute accent colors -->
+    <color name="cute_pink">#FFB6C1</color>
+    <color name="cute_lavender">#D1C4E9</color>
+    <color name="cute_mint">#C8E6C9</color>
+    <color name="cute_yellow">#FFF9C4</color>
+    <color name="cute_peach">#FFCCBC</color>
+</resources>

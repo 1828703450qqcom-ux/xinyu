@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#3182ce">
+    <meta name="description" content="心语 - 你的情绪小助手">
+    <title>心语 - 情绪助手</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-male">
+
+    <!-- ========== 主内容区 ========== -->
+    <div class="app-container">
+
+        <!-- ===== 首页 Tab ===== -->
+        <div class="tab-page active" id="page-home">
+            <div class="page-scroll">
+                <!-- 顶部问候 -->
+                <div class="home-header">
+                    <div class="home-greeting">
+                        <h2 id="greetingText">下午好呀 ☀️</h2>
+                        <p id="greetingSub">今天过得怎么样？</p>
+                    </div>
+                    <div class="home-avatar" onclick="switchTab('profile')">🙋</div>
+                </div>
+
+                <!-- 天气卡片 -->
+                <div class="weather-card" id="weatherCard">
+                    <div class="weather-left">
+                        <div class="weather-icon" id="weatherIcon">🌤️</div>
+                        <div class="weather-temp" id="weatherTemp">--°</div>
+                    </div>
+                    <div class="weather-right">
+                        <div class="weather-city" id="weatherCity">定位中...</div>
+                        <div class="weather-desc" id="weatherDesc">获取天气信息</div>
+                        <div class="weather-detail" id="weatherDetail"></div>
+                    </div>
+                </div>
+
+                <!-- 每日一句 -->
+                <div class="quote-card">
+                    <div class="quote-icon">💬</div>
+                    <p class="quote-text" id="dailyQuote">加载中...</p>
+                    <div class="quote-author" id="quoteAuthor"></div>
+                </div>
+
+                <!-- 快捷入口 -->
+                <div class="quick-actions">
+                    <div class="quick-item" onclick="switchTab('mood')">
+                        <div class="quick-icon qi-mood">📝</div>
+                        <span>记录心情</span>
+                    </div>
+                    <div class="quick-item" onclick="switchTab('test')">
+                        <div class="quick-icon qi-test">🧠</div>
+                        <span>心理测评</span>
+                    </div>
+                    <div class="quick-item" onclick="switchTab('note')">
+                        <div class="quick-icon qi-note">📒</div>
+                        <span>我的笔记</span>
+                    </div>
+                    <div class="quick-item" onclick="openHelpPanel()">
+                        <div class="quick-icon qi-help">📞</div>
+                        <span>求助热线</span>
+                    </div>
+                </div>
+
+                <!-- 今日心情概览 -->
+                <div class="section-title">今日心情</div>
+                <div class="today-mood-card" id="todayMoodCard">
+                    <div class="today-mood-empty">
+                        <span>🌈</span>
+                        <p>今天还没有记录心情哦</p>
+                        <button onclick="switchTab('mood')">去记录 →</button>
+                    </div>
+                </div>
+
+                <!-- 最近笔记 -->
+                <div class="section-title">最近笔记</div>
+                <div class="recent-notes" id="recentNotes">
+                    <div class="empty-tip">还没有笔记，去写一篇吧 ✍️</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 心情 Tab ===== -->
+        <div class="tab-page" id="page-mood">
+            <div class="page-scroll">
+                <div class="page-top-bar">
+                    <h2>今日心情</h2>
+                </div>
+
+                <!-- 指针式心情盘 -->
+                <div class="mood-dial-wrap">
+                    <div class="mood-dial" id="moodDial">
+                        <svg viewBox="0 0 200 200" class="dial-svg">
+                            <!-- 背景圆弧 -->
+                            <circle cx="100" cy="100" r="85" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"
+                                stroke-dasharray="400 534" transform="rotate(135 100 100)"/>
+                            <!-- 彩色进度弧 -->
+                            <circle cx="100" cy="100" r="85" fill="none" stroke="url(#dialGrad)" stroke-width="12" stroke-linecap="round"
+                                stroke-dasharray="0 534" transform="rotate(135 100 100)" id="dialArc"/>
+                            <!-- 渐变定义 -->
+                            <defs>
+                                <linearGradient id="dialGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#f59e0b"/>
+                                    <stop offset="50%" stop-color="#10b981"/>
+                                    <stop offset="100%" stop-color="#ef4444"/>
+                                </linearGradient>
+                            </defs>
+                            <!-- 刻度标记 -->
+                            <g id="dialMarks"></g>
+                            <!-- 指针 -->
+                            <g id="dialPointer" transform="rotate(0 100 100)">
+                                <line x1="100" y1="100" x2="100" y2="30" stroke="#6366f1" stroke-width="3" stroke-linecap="round"/>
+                                <circle cx="100" cy="100" r="6" fill="#6366f1"/>
+                                <circle cx="100" cy="100" r="3" fill="#fff"/>
+                            </g>
+                        </svg>
+                        <div class="dial-center">
+                            <div class="dial-emoji" id="dialEmoji">😐</div>
+                            <div class="dial-label" id="dialLabel">拖动指针选择心情</div>
+                        </div>
+                    </div>
+                    <!-- 快捷选择 -->
+                    <div class="mood-quick-row">
+                        <button class="mood-qbtn" data-val="1" onclick="setMoodValue(1)">😢<small>难过</small></button>
+                        <button class="mood-qbtn" data-val="2" onclick="setMoodValue(2)">😰<small>焦虑</small></button>
+                        <button class="mood-qbtn" data-val="3" onclick="setMoodValue(3)">😐<small>平静</small></button>
+                        <button class="mood-qbtn" data-val="4" onclick="setMoodValue(4)">😊<small>开心</small></button>
+                        <button class="mood-qbtn" data-val="5" onclick="setMoodValue(5)">😄<small>超棒</small></button>
+                    </div>
+                </div>
+
+                <!-- 心情笔记 -->
+                <div class="mood-note-area">
+                    <textarea id="moodNote" placeholder="写点什么记录一下今天..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="submitMood()">保存心情</button>
+
+                <!-- 统计 -->
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-num" id="statMoods">0</div>
+                        <div class="stat-txt">心情记录</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" id="statCheckins">0</div>
+                        <div class="stat-txt">打卡天数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" id="statHappy">0%</div>
+                        <div class="stat-txt">开心比例</div>
+                    </div>
+                </div>
+
+                <!-- 历史记录 -->
+                <div class="section-title">最近心情</div>
+                <div class="mood-history" id="moodHistory"></div>
+            </div>
+        </div>
+
+        <!-- ===== 测评 Tab ===== -->
+        <div class="tab-page" id="page-test">
+            <div class="page-scroll">
+                <div class="page-top-bar">
+                    <h2>心理测评</h2>
+                </div>
+                <p class="page-desc">通过简单的测评了解自己的心理状态</p>
+
+                <div class="test-list">
+                    <div class="test-card" onclick="startTest('phq9')">
+                        <div class="test-icon">💙</div>
+                        <div class="test-info">
+                            <h3>PHQ-9 抑郁筛查</h3>
+                            <p>9道题，了解你的情绪状态</p>
+                            <div class="test-meta">
+                                <span class="test-time">⏱ 约2分钟</span>
+                                <span class="test-count" id="phq9Count">0次测评</span>
+                            </div>
+                        </div>
+                        <div class="test-arrow">→</div>
+                    </div>
+                    <div class="test-card" onclick="startTest('gad7')">
+                        <div class="test-icon">💜</div>
+                        <div class="test-info">
+                            <h3>GAD-7 焦虑筛查</h3>
+                            <p>7道题，评估你的焦虑程度</p>
+                            <div class="test-meta">
+                                <span class="test-time">⏱ 约2分钟</span>
+                                <span class="test-count" id="gad7Count">0次测评</span>
+                            </div>
+                        </div>
+                        <div class="test-arrow">→</div>
+                    </div>
+                    <div class="test-card" onclick="startTest('stress')">
+                        <div class="test-icon">🧡</div>
+                        <div class="test-info">
+                            <h3>PSS 压力知觉量表</h3>
+                            <p>10道题，了解你的压力水平</p>
+                            <div class="test-meta">
+                                <span class="test-time">⏱ 约3分钟</span>
+                                <span class="test-count" id="stressCount">0次测评</span>
+                            </div>
+                        </div>
+                        <div class="test-arrow">→</div>
+                    </div>
+                    <div class="test-card" onclick="startTest('sleep')">
+                        <div class="test-icon">💚</div>
+                        <div class="test-info">
+                            <h3>睡眠质量评估</h3>
+                            <p>5道题，看看你的睡眠好不好</p>
+                            <div class="test-meta">
+                                <span class="test-time">⏱ 约1分钟</span>
+                                <span class="test-count" id="sleepCount">0次测评</span>
+                            </div>
+                        </div>
+                        <div class="test-arrow">→</div>
+                    </div>
+                </div>
+
+                <!-- 测评历史 -->
+                <div class="section-title">测评记录</div>
+                <div id="testHistory" class="test-history"></div>
+            </div>
+        </div>
+
+        <!-- ===== 笔记 Tab ===== -->
+        <div class="tab-page" id="page-note">
+            <div class="page-scroll">
+                <div class="page-top-bar">
+                    <h2>我的笔记</h2>
+                    <button class="top-btn" onclick="createNote()">+ 新建</button>
+                </div>
+                <div class="note-list" id="noteList"></div>
+            </div>
+        </div>
+
+        <!-- ===== 我的 Tab ===== -->
+        <div class="tab-page" id="page-profile">
+            <div class="page-scroll">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileAvatar">🙋</div>
+                    <div class="profile-name" id="profileName">游客</div>
+                    <div class="profile-id" id="profileId">点击登录解锁更多功能</div>
+                </div>
+
+                <div class="profile-menu">
+                    <div class="menu-group">
+                        <div class="menu-item" onclick="toggleTheme()">
+                            <span class="menu-icon">🎨</span>
+                            <span class="menu-text">切换主题</span>
+                            <span class="menu-extra" id="themeLabel">男生版</span>
+                            <span class="menu-arrow">›</span>
+                        </div>
+                        <div class="menu-item" onclick="openContactsPanel()">
+                            <span class="menu-icon">🧑‍🤝‍🧑</span>
+                            <span class="menu-text">紧急联系人</span>
+                            <span class="menu-arrow">›</span>
+                        </div>
+                        <div class="menu-item" onclick="openHelpPanel()">
+                            <span class="menu-icon">📞</span>
+                            <span class="menu-text">求助热线</span>
+                            <span class="menu-arrow">›</span>
+                        </div>
+                    </div>
+                    <div class="menu-group">
+                        <div class="menu-item" onclick="doDailyCheckin()">
+                            <span class="menu-icon">✅</span>
+                            <span class="menu-text">每日打卡</span>
+                            <span class="menu-extra" id="checkinLabel">未打卡</span>
+                            <span class="menu-arrow">›</span>
+                        </div>
+                    </div>
+                    <div class="menu-group">
+                        <div class="menu-item" id="loginMenu" onclick="goLogin()">
+                            <span class="menu-icon">🔑</span>
+                            <span class="menu-text">登录 / 注册</span>
+                            <span class="menu-arrow">›</span>
+                        </div>
+                        <div class="menu-item" id="logoutMenu" onclick="doLogout()" style="display:none">
+                            <span class="menu-icon">🚪</span>
+                            <span class="menu-text">退出登录</span>
+                            <span class="menu-arrow">›</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-footer">
+                    <p>💙 心语情绪助手 v2.0</p>
+                    <p>你值得被温柔以待</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 底部 Tab 栏 ========== -->
+    <nav class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('home')" data-tab="home">
+            <div class="tab-icon">🏠</div>
+            <div class="tab-label">首页</div>
+        </div>
+        <div class="tab-item" onclick="switchTab('mood')" data-tab="mood">
+            <div class="tab-icon">😊</div>
+            <div class="tab-label">心情</div>
+        </div>
+        <div class="tab-item" onclick="switchTab('test')" data-tab="test">
+            <div class="tab-icon">🧠</div>
+            <div class="tab-label">测评</div>
+        </div>
+        <div class="tab-item" onclick="switchTab('note')" data-tab="note">
+            <div class="tab-icon">📒</div>
+            <div class="tab-label">笔记</div>
+        </div>
+        <div class="tab-item" onclick="switchTab('profile')" data-tab="profile">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">我的</div>
+        </div>
+    </nav>
+
+    <!-- ========== 测评弹窗 ========== -->
+    <div class="modal-overlay" id="testOverlay" onclick="closeTestModal()"></div>
+    <div class="test-modal" id="testModal">
+        <div class="test-modal-header">
+            <h3 id="testTitle">测评</h3>
+            <button class="modal-close" onclick="closeTestModal()">&times;</button>
+        </div>
+        <div class="test-modal-body" id="testBody"></div>
+    </div>
+
+    <!-- ========== 笔记编辑弹窗 ========== -->
+    <div class="modal-overlay" id="noteOverlay" onclick="closeNoteModal()"></div>
+    <div class="note-modal" id="noteModal">
+        <div class="note-modal-header">
+            <input type="text" id="noteTitleInput" placeholder="笔记标题">
+            <button class="modal-close" onclick="closeNoteModal()">&times;</button>
+        </div>
+        <div class="note-modal-body">
+            <textarea id="noteContentInput" placeholder="开始写吧..."></textarea>
+        </div>
+        <div class="note-modal-footer">
+            <button class="btn-secondary" onclick="deleteCurrentNote()">删除</button>
+            <button class="btn-primary" onclick="saveNote()">保存</button>
+        </div>
+    </div>
+
+    <!-- ========== 求助热线弹窗 ========== -->
+    <div class="modal-overlay" id="helpOverlay" onclick="closeHelpPanel()"></div>
+    <div class="help-modal" id="helpModal">
+        <div class="help-modal-header">
+            <h3>📞 求助热线</h3>
+            <button class="modal-close" onclick="closeHelpPanel()">&times;</button>
+        </div>
+        <div class="help-modal-body">
+            <div class="helpline-card emergency">
+                <div class="hl-icon">🚨</div>
+                <h4>紧急求助</h4>
+                <a href="tel:110" class="hl-phone">110</a>
+                <p>遇到危险请立即报警</p>
+            </div>
+            <div class="helpline-card emergency">
+                <div class="hl-icon">🚑</div>
+                <h4>急救电话</h4>
+                <a href="tel:120" class="hl-phone">120</a>
+                <p>身体不适请立即拨打</p>
+            </div>
+            <div class="helpline-card">
+                <div class="hl-icon">💚</div>
+                <h4>心理援助热线</h4>
+                <a href="tel:123205" class="hl-phone">12320-5</a>
+                <p>全国心理援助热线</p>
+            </div>
+            <div class="helpline-card">
+                <div class="hl-icon">💙</div>
+                <h4>希望24热线</h4>
+                <a href="tel:4001619995" class="hl-phone">400-161-9995</a>
+                <p>24小时心理危机干预</p>
+            </div>
+            <div class="helpline-card">
+                <div class="hl-icon">💜</div>
+                <h4>生命热线</h4>
+                <a href="tel:4008211215" class="hl-phone">400-821-1215</a>
+                <p>24小时心理援助</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 联系人弹窗 ========== -->
+    <div class="modal-overlay" id="contactOverlay" onclick="closeContactsPanel()"></div>
+    <div class="contact-modal" id="contactModal">
+        <div class="contact-modal-header">
+            <h3>🧑‍🤝‍🧑 紧急联系人</h3>
+            <button class="modal-close" onclick="closeContactsPanel()">&times;</button>
+        </div>
+        <div class="contact-modal-body">
+            <div class="contact-add-form">
+                <input type="text" id="cName" placeholder="姓名">
+                <input type="tel" id="cPhone" placeholder="电话">
+                <select id="cRelation">
+                    <option value="">关系</option>
+                    <option value="家人">家人</option>
+                    <option value="朋友">朋友</option>
+                    <option value="老师">老师</option>
+                    <option value="辅导员">辅导员</option>
+                </select>
+                <button class="btn-primary btn-sm" onclick="addContact()">添加</button>
+            </div>
+            <div id="contactList" class="contact-list"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

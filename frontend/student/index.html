@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生管理系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <h1>学生管理系统</h1>
+            </div>
+            <nav>
+                <a href="#students" class="nav-link active">学生列表</a>
+                <a href="#add" class="nav-link">添加学生</a>
+                <a href="#stats" class="nav-link">数据统计</a>
+            </nav>
+        </header>
+
+        <!-- 数据统计 -->
+        <section id="stats" class="section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">学生总数</div>
+                </div>
+                <div class="stat-card male">
+                    <div class="stat-number" id="maleCount">0</div>
+                    <div class="stat-label">男生</div>
+                </div>
+                <div class="stat-card female">
+                    <div class="stat-number" id="femaleCount">0</div>
+                    <div class="stat-label">女生</div>
+                </div>
+            </div>
+            <div class="major-stats" id="majorStats"></div>
+        </section>
+
+        <!-- 添加/编辑学生表单 -->
+        <section id="add" class="section">
+            <div class="section-header">
+                <h2 id="formTitle">添加学生</h2>
+            </div>
+            <form id="studentForm" class="student-form">
+                <input type="hidden" id="editId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>学号 *</label>
+                        <input type="text" id="studentId" required placeholder="请输入学号">
+                    </div>
+                    <div class="form-group">
+                        <label>姓名 *</label>
+                        <input type="text" id="name" required placeholder="请输入姓名">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>性别</label>
+                        <select id="gender">
+                            <option value="">请选择</option>
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>年龄</label>
+                        <input type="number" id="age" placeholder="请输入年龄">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>专业</label>
+                        <input type="text" id="major" placeholder="请输入专业">
+                    </div>
+                    <div class="form-group">
+                        <label>班级</label>
+                        <input type="text" id="className" placeholder="请输入班级">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>电话</label>
+                        <input type="tel" id="phone" placeholder="请输入电话">
+                    </div>
+                    <div class="form-group">
+                        <label>邮箱</label>
+                        <input type="email" id="email" placeholder="请输入邮箱">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <label>地址</label>
+                    <input type="text" id="address" placeholder="请输入地址">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="submitBtn">添加学生</button>
+                    <button type="button" class="btn-secondary" id="cancelBtn" onclick="cancelEdit()">取消</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- 学生列表 -->
+        <section id="students" class="section">
+            <div class="section-header">
+                <h2>学生列表</h2>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索学号/姓名/专业..." oninput="searchStudents()">
+                    <button onclick="searchStudents()">🔍 搜索</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="studentTable">
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>年龄</th>
+                            <th>专业</th>
+                            <th>班级</th>
+                            <th>电话</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentList"></tbody>
+                </table>
+            </div>
+            <div id="emptyMsg" class="empty-msg" style="display:none">暂无学生数据</div>
+        </section>
+
+        <footer>
+            <p>🎓 学生管理系统 | 河南财经政法大学</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

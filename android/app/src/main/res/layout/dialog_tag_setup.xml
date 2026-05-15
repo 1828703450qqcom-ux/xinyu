@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="设置你的标签"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="选择你的情绪状态和兴趣，帮你匹配相似的人"
+        android:textSize="13sp"
+        android:textColor="@color/text_secondary" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="当前心情"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_mood"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="兴趣爱好"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_interest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="20dp"
+        android:text="完成"
+        android:textColor="@android:color/white"
+        android:textSize="15sp"
+        app:backgroundTint="@color/primary"
+        app:cornerRadius="14dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+</LinearLayout>

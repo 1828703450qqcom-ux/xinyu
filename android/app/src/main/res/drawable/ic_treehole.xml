@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Tree trunk -->
+    <path
+        android:fillColor="#8D6E63"
+        android:pathData="M10,22 L14,22 L13,14 L11,14 Z" />
+    <!-- Tree crown -->
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M12,2 C8,2 4,6 4,10 C4,13 6,15 8,15 L16,15 C18,15 20,13 20,10 C20,6 16,2 12,2 Z" />
+    <!-- Hole -->
+    <path
+        android:fillColor="#5D4037"
+        android:pathData="M12,8 C10.9,8 10,8.9 10,10 C10,11.1 10.9,12 12,12 C13.1,12 14,11.1 14,10 C14,8.9 13.1,8 12,8 Z" />
+</vector>

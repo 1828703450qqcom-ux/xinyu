@@ -1,0 +1,26 @@
+{
+    "name": "心语 - 情绪助手",
+    "short_name": "心语",
+    "description": "你的情绪小助手，记录心情、AI聊天、美食治愈",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f0f4f8",
+    "theme_color": "#3182ce",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "icon-192.svg",
+            "sizes": "192x192",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icon-512.svg",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["health", "lifestyle"],
+    "lang": "zh-CN"
+}

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>暖茶小筑 - 管理后台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#FF6B8A;--primary-light:#FFB6C1;--bg:#FFF8F0;--surface:#FFFFFF;--text:#333;--text2:#999;--text3:#B0A89E;--border:#F0EBE5;--accent:#7986CB;--green:#4CAF50;--red:#D32F2F;--orange:#FF9800;--blue:#2196F3;--purple:#9C27B0;--sunset1:#FF8A9B;--sunset2:#FFB6C1}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.header{background:linear-gradient(135deg,var(--sunset1),var(--sunset2));padding:16px 20px;color:#fff;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.header-top{display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:20px;font-weight:700}
+.header p{font-size:12px;opacity:.85;margin-top:2px}
+.header .refresh{background:rgba(255,255,255,.25);border:none;padding:6px 14px;border-radius:16px;color:#fff;font-size:12px;cursor:pointer}
+.header .refresh:active{background:rgba(255,255,255,.4)}
+.nav-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:56px;z-index:40}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{padding:12px 14px;font-size:13px;color:var(--text3);cursor:pointer;white-space:nowrap;border-bottom:2.5px solid transparent;transition:.2s;flex-shrink:0}
+.nav-tab.active{color:var(--primary);border-color:var(--primary);font-weight:600}
+.content{padding:12px;max-width:900px;margin:0 auto}
+.section{display:none}.section.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+@media(min-width:600px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
+.stat-card{background:var(--surface);border-radius:16px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);text-align:center}
+.stat-card .label{font-size:12px;color:var(--text2);margin-bottom:4px}
+.stat-card .value{font-size:28px;font-weight:700}
+.stat-card.pink .value{color:var(--primary)}
+.stat-card.orange .value{color:var(--orange)}
+.stat-card.blue .value{color:var(--blue)}
+.stat-card.green .value{color:var(--green)}
+.stat-card.purple .value{color:var(--purple)}
+.card{background:var(--surface);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.card h3{font-size:15px;color:var(--primary);margin-bottom:12px;font-weight:600}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-pink{background:#FFE0EC;color:var(--primary)}
+.badge-blue{background:#E3F2FD;color:var(--blue)}
+.badge-green{background:#E8F5E9;color:var(--green)}
+.badge-orange{background:#FFF3E0;color:#E65100}
+.badge-purple{background:#F3E5F5;color:var(--purple)}
+.btn{border:none;padding:6px 14px;border-radius:12px;cursor:pointer;font-size:12px;font-weight:600;transition:.15s}
+.btn:active{transform:scale(.95)}
+.btn-pink{background:var(--primary);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.banned-tag{background:#FFE0E0;color:var(--red);padding:2px 8px;border-radius:8px;font-size:11px}
+.post-card{background:var(--bg);border-radius:14px;padding:14px;margin-bottom:10px}
+.post-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.post-author{font-weight:600;color:var(--accent);font-size:13px}
+.post-time{font-size:11px;color:var(--text3)}
+.post-content{font-size:14px;line-height:1.6;color:var(--text)}
+.post-footer{font-size:12px;color:var(--text2);margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+.post-tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;background:#E8EAF6;color:var(--accent)}
+.chat-msg{display:flex;gap:8px;margin-bottom:10px;align-items:flex-start}
+.chat-msg .bubble{flex:1;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.6;word-break:break-word}
+.chat-msg .bubble.user{background:#F0F4FF}
+.chat-msg .bubble.ai{background:#FFF5F0}
+.chat-msg .bubble .meta{font-size:11px;color:var(--text3);margin-top:4px}
+.user-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.user-row:last-child{border-bottom:none}
+.user-row .avatar{width:36px;height:36px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.user-row .info{flex:1;min-width:0}
+.user-row .info .name{font-weight:600;font-size:14px}
+.user-row .info .sub{font-size:11px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-row .actions{display:flex;gap:6px;flex-shrink:0}
+.scroll-list{max-height:60vh;overflow-y:auto}
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
+.loading{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.bar-item{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-item .bar-label{min-width:50px;font-size:13px;text-align:center;flex-shrink:0}
+.bar-item .bar-track{flex:1;height:22px;background:var(--bg);border-radius:11px;overflow:hidden}
+.bar-item .bar-fill{height:100%;background:linear-gradient(90deg,var(--sunset1),var(--sunset2));border-radius:11px;transition:width .5s}
+.bar-item .bar-count{width:36px;text-align:right;font-size:12px;color:var(--text2);flex-shrink:0}
+.case-card{background:var(--bg);border-radius:14px;padding:14px;margin-bottom:10px;border-left:3px solid var(--accent)}
+.case-card .case-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.case-card .case-status{font-size:11px;padding:2px 8px;border-radius:8px}
+.case-open{background:#FFF3E0;color:#E65100}
+.case-answered{background:#E8F5E9;color:var(--green)}
+.case-closed{background:#F0F0F0;color:var(--text3)}
+.answer-card{background:var(--surface);border-radius:10px;padding:10px;margin:6px 0;border-left:2px solid var(--green)}
+.answer-author{font-size:11px;color:var(--green);font-weight:600;margin-bottom:4px}
+.answer-content{font-size:13px;line-height:1.5}
+.tab-sub{display:flex;gap:6px;padding:8px 0;margin-bottom:8px}
+.tab-sub .btn{font-size:12px}
+.tab-sub .btn.active{background:var(--primary);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- 登录页 -->
+<div id="login-page" style="display:none;min-height:100vh;background:var(--bg);align-items:center;justify-content:center">
+  <div style="background:var(--surface);border-radius:20px;padding:32px;width:90%;max-width:360px;box-shadow:0 4px 20px rgba(0,0,0,.08);text-align:center">
+    <div style="font-size:48px;margin-bottom:12px">🌸</div>
+    <h2 style="color:var(--primary);margin-bottom:8px">暖茶小筑管理后台</h2>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:24px">请输入管理员密码</p>
+    <input id="login-pwd" type="password" placeholder="密码" style="width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;outline:none;margin-bottom:12px;box-sizing:border-box">
+    <div id="login-err" style="color:var(--red);font-size:12px;margin-bottom:12px;display:none"></div>
+    <button onclick="doLogin()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--sunset1),var(--sunset2));color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer">登录</button>
+  </div>
+</div>
+
+<!-- 主体 -->
+<div id="admin-body" style="display:none">
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>🌸 暖茶小筑管理后台</h1>
+      <p id="header-sub">加载中...</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="refresh" onclick="loadData()">刷新</button>
+      <button class="refresh" onclick="doLogout()">退出</button>
+    </div>
+  </div>
+</div>
+
+<div class="nav-tabs" id="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab(0,this)">📊 概览</div>
+  <div class="nav-tab" onclick="switchTab(1,this)">🏠 筑爱故事汇</div>
+  <div class="nav-tab" onclick="switchTab(2,this)">🌸 心晴评测</div>
+  <div class="nav-tab" onclick="switchTab(3,this)">🫧 叙心树洞</div>
+  <div class="nav-tab" onclick="switchTab(4,this)">💬 投递树洞</div>
+  <div class="nav-tab" onclick="switchTab(5,this)">👥 用户</div>
+  <div class="nav-tab" onclick="switchTab(6,this)">🤖 AI对话</div>
+</div>
+
+<div class="content">
+  <!-- 概览 -->
+  <div class="section active" id="sec-overview">
+    <div class="stats-grid" id="stats-grid"><div class="loading">加载中...</div></div>
+  </div>
+
+  <!-- 筑爱故事汇 -->
+  <div class="section" id="sec-story">
+    <div class="card">
+      <h3>🏠 筑爱故事汇 <span id="story-count" class="badge badge-pink" style="margin-left:8px">0</span></h3>
+      <div class="scroll-list" id="story-list"><div class="loading">加载中...</div></div>
+    </div>
+  </div>
+
+  <!-- 心晴评测 -->
+  <div class="section" id="sec-mood">
+    <div class="card"><h3>😊 心情分布</h3><div id="mood-chart"></div></div>
+    <div class="card">
+      <h3>📋 测评记录 <span id="test-count" class="badge badge-blue" style="margin-left:8px">0</span></h3>
+      <div class="scroll-list" id="test-list"><div class="loading">加载中...</div></div>
+    </div>
+  </div>
+
+  <!-- 叙心树洞 -->
+  <div class="section" id="sec-treehole">
+    <div class="card">
+      <h3>🫧 叙心树洞 <span id="treehole-count" class="badge badge-pink" style="margin-left:8px">0</span></h3>
+      <div class="scroll-list" id="treehole-list"><div class="loading">加载中...</div></div>
+    </div>
+  </div>
+
+  <!-- 投递树洞 -->
+  <div class="section" id="sec-cases">
+    <div class="card">
+      <h3>💬 投递树洞案例 <span id="cases-count" class="badge badge-purple" style="margin-left:8px">0</span></h3>
+      <div class="scroll-list" id="cases-list"><div class="loading">加载中...</div></div>
+    </div>
+  </div>
+
+  <!-- 用户 -->
+  <div class="section" id="sec-users">
+    <div class="card"><h3>🔑 注册用户</h3><div class="scroll-list" id="server-users-list"></div></div>
+    <div class="card"><h3>📱 设备用户</h3><div class="scroll-list" id="device-users-list"></div></div>
+  </div>
+
+  <!-- AI对话 -->
+  <div class="section" id="sec-chat">
+    <div class="card">
+      <h3>🤖 AI对话记录 <span id="chat-count" class="badge badge-blue" style="margin-left:8px">0</span></h3>
+      <div class="scroll-list" id="chat-list"><div class="loading">加载中...</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const MOOD_EMOJI={happy:'😊',sad:'😢',angry:'😤',anxious:'😰',calm:'😌',excited:'🤩',tired:'😴',neutral:'😐'};
+
+function fmt(s){if(!s)return'-';try{const d=new Date(typeof s==='number'?s*1000:s.replace(' ','T')+(s.includes('Z')?'':'Z'));const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());}catch(e){return s;}}
+function esc(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+const tabs=['sec-overview','sec-story','sec-mood','sec-treehole','sec-cases','sec-users','sec-chat'];
+function switchTab(idx,el){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(tabs[idx]).classList.add('active');
+}
+
+async function delPost(pid){if(!confirm('删除这条帖子？'))return;await fetch('/api/admin/delete_post',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({post_id:pid})});loadData();}
+async function delReply(rid){if(!confirm('删除这条回复？'))return;await fetch('/api/admin/delete_reply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reply_id:rid})});loadData();}
+async function delChat(mid){if(!confirm('删除这条对话？'))return;await fetch('/api/admin/delete_chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg_id:mid})});loadData();}
+async function banUser(u){if(!confirm('封禁 '+u+'？'))return;await fetch('/api/admin/ban',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u})});loadData();}
+async function unbanUser(u){await fetch('/api/admin/unban',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u})});loadData();}
+async function deleteUser(u){if(!confirm('删除用户 '+u+'？不可恢复！'))return;await fetch('/api/admin/delete_user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u})});loadData();}
+async function deleteDevice(did){if(!confirm('删除该设备所有数据？'))return;await fetch('/api/admin/delete_device',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({device_id:did})});loadData();}
+async function approveUser(u){if(!confirm('审核通过 '+u+'？'))return;await fetch('/api/admin/approve_user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u})});loadData();}
+async function rejectUser(u){if(!confirm('拒绝 '+u+' 的申请？'))return;await fetch('/api/admin/reject_user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u})});loadData();}
+
+function renderPost(p,delFn){
+  let tags='';
+  if(p.tags){
+    try{const t=typeof p.tags==='string'?JSON.parse(p.tags):p.tags;
+    if(t&&t.length)tags='<div class="post-tags">'+t.map(x=>'<span class="tag">'+esc(x)+'</span>').join('')+'</div>';}catch(e){}
+  }
+  let media='';
+  if(p.media_url){const v=p.media_url.match(/\.(mp4|mov|avi)$/i);media=v?'<video src="'+p.media_url+'" controls style="width:100%;border-radius:8px;margin-top:8px;max-height:160px"></video>':'<img src="'+p.media_url+'" style="max-width:100%;max-height:160px;border-radius:8px;margin-top:8px;object-fit:cover">';}
+  return '<div class="post-card"><div class="post-top"><span class="post-author">'+esc(p.anonymous_name||'匿名')+'</span><div style="display:flex;align-items:center;gap:6px"><span class="post-time">'+fmt(p.created_at)+'</span><button class="btn btn-red" style="padding:2px 8px;font-size:11px" onclick="'+delFn+'('+p.id+')">删除</button></div></div><div class="post-content">'+esc(p.content||'')+'</div>'+media+tags+'<div class="post-footer"><span>❤️ '+p.like_count+' · 💬 '+p.reply_count+'</span><span style="font-size:11px;color:var(--text3)">'+(p.device_id||'').substring(0,12)+'</span></div></div>';
+}
+
+async function loadData(){
+  try{
+    const s=await fetch('/api/admin/stats').then(r=>r.json());
+    if(s.error){showLogin();return;}
+
+    // 概览
+    document.getElementById('header-sub').textContent='注册用户 '+s.server_users.length+' · 设备用户 '+s.total_users+' · 今日活跃 '+s.active_today;
+    document.getElementById('stats-grid').innerHTML=`
+      <div class="stat-card pink"><div class="label">注册用户</div><div class="value">${s.server_users.length}</div></div>
+      <div class="stat-card orange"><div class="label">今日活跃</div><div class="value">${s.active_today}</div></div>
+      <div class="stat-card blue"><div class="label">筑爱故事</div><div class="value">${s.total_stories}</div></div>
+      <div class="stat-card green"><div class="label">叙心树洞</div><div class="value">${s.total_treehole}</div></div>
+      <div class="stat-card purple"><div class="label">投递案例</div><div class="value">${s.total_cases}</div></div>
+      <div class="stat-card pink"><div class="label">心情记录</div><div class="value">${s.total_moods}</div></div>
+      <div class="stat-card blue"><div class="label">AI对话</div><div class="value">${s.total_chats}</div></div>
+      <div class="stat-card orange"><div class="label">总回复</div><div class="value">${s.total_replies}</div></div>`;
+
+    // 筑爱故事汇
+    document.getElementById('story-count').textContent=s.total_stories;
+    const storyDiv=document.getElementById('story-list');
+    if(s.story_posts&&s.story_posts.length){storyDiv.innerHTML=s.story_posts.map(p=>renderPost(p,'delPost')).join('');}
+    else{storyDiv.innerHTML='<div class="empty">暂无故事</div>';}
+
+    // 心晴评测
+    const moodDiv=document.getElementById('mood-chart');
+    if(s.mood_stats&&s.mood_stats.length){
+      const maxM=Math.max(...s.mood_stats.map(m=>m.count),1);
+      moodDiv.innerHTML=s.mood_stats.map(m=>'<div class="bar-item"><div class="bar-label">'+(MOOD_EMOJI[m.mood]||'❓')+'</div><div class="bar-track"><div class="bar-fill" style="width:'+m.count/maxM*100+'%"></div></div><div class="bar-count">'+m.count+'</div></div>').join('');
+    }else{moodDiv.innerHTML='<div class="empty">暂无心情数据</div>';}
+
+    document.getElementById('test-count').textContent=(s.test_results||[]).length;
+    const testDiv=document.getElementById('test-list');
+    if(s.test_results&&s.test_results.length){
+      testDiv.innerHTML=s.test_results.map(t=>'<div class="user-row"><div class="avatar">📋</div><div class="info"><div class="name">'+esc(t.test_title)+'</div><div class="sub">得分: '+t.score+' · '+esc(t.level)+' · '+fmt(t.created_at)+'</div></div></div>').join('');
+    }else{testDiv.innerHTML='<div class="empty">暂无测评记录</div>';}
+
+    // 叙心树洞
+    document.getElementById('treehole-count').textContent=s.total_treehole;
+    const thDiv=document.getElementById('treehole-list');
+    if(s.treehole_posts&&s.treehole_posts.length){thDiv.innerHTML=s.treehole_posts.map(p=>renderPost(p,'delPost')).join('');}
+    else{thDiv.innerHTML='<div class="empty">暂无树洞帖子</div>';}
+
+    // 投递树洞
+    document.getElementById('cases-count').textContent=s.total_cases;
+    const caseDiv=document.getElementById('cases-list');
+    if(s.treehole_cases&&s.treehole_cases.length){
+      caseDiv.innerHTML=s.treehole_cases.map(c=>{
+        const statusCls=c.status==='answered'?'case-answered':c.status==='closed'?'case-closed':'case-open';
+        const statusText=c.status==='answered'?'已解答':c.status==='closed'?'已关闭':'待解答';
+        let tags='';
+        try{const t=typeof c.tags==='string'?JSON.parse(c.tags):c.tags;if(t&&t.length)tags='<div class="post-tags">'+t.map(x=>'<span class="tag">'+esc(x)+'</span>').join('')+'</div>';}catch(e){}
+        return '<div class="case-card"><div class="case-header"><span class="post-author">'+esc(c.author_username||'匿名')+' <span class="badge badge-blue">'+esc(c.author_type||'user')+'</span></span><span class="case-status '+statusCls+'">'+statusText+'</span></div><div class="post-content">'+esc(c.content||'')+'</div>'+tags+'<div class="post-footer"><span>❤️ '+c.like_count+' · 💬 '+c.answer_count+'条解答</span><span style="font-size:11px;color:var(--text3)">'+fmt(c.created_at)+'</span></div></div>';
+      }).join('');
+    }else{caseDiv.innerHTML='<div class="empty">暂无投递案例</div>';}
+
+    // 用户
+    document.getElementById('server-users-list').innerHTML=s.server_users.map(u=>{
+      const typeBadge=u.user_type==='volunteer'?'<span class="badge badge-green">志愿者</span>':u.user_type==='counselor'?'<span class="badge badge-purple">辅导师</span>':'<span class="badge badge-blue">用户</span>';
+      let verifyBadge='';
+      if(u.user_type==='volunteer'||u.user_type==='counselor'){
+        if(u.verify_status==='approved')verifyBadge=' <span class="badge badge-green">已通过</span>';
+        else if(u.verify_status==='rejected')verifyBadge=' <span class="badge badge-orange">已拒绝</span>';
+        else if(u.verify_status==='pending')verifyBadge=' <span class="badge badge-orange">待审核</span>';
+        else verifyBadge=' <span class="badge badge-orange">未提交</span>';
+      }
+      let verifyBtns='';
+      if((u.user_type==='volunteer'||u.user_type==='counselor')&&u.verify_status!=='approved'){
+        verifyBtns='<button class="btn btn-green" onclick="approveUser(\''+u.username+'\')" style="font-size:11px;padding:2px 8px">通过</button><button class="btn btn-red" onclick="rejectUser(\''+u.username+'\')" style="font-size:11px;padding:2px 8px">拒绝</button>';
+      }
+      // 解析审核资料
+      let verifyInfo='';
+      if(u.verify_data){
+        try{
+          const vd=typeof u.verify_data==='string'?JSON.parse(u.verify_data):u.verify_data;
+          if(u.user_type==='volunteer'){
+            verifyInfo='<div style="margin-top:6px;padding:8px 10px;background:#f0fdf4;border-radius:8px;font-size:12px;color:#166534;line-height:1.8">'+
+              '<b>🎓 学校：</b>'+esc(vd.university||'-')+'<br>'+
+              '<b>🆔 学号：</b>'+esc(vd.student_id||'-')+'<br>'+
+              '<b>💬 申请理由：</b>'+esc(vd.reason||'-')+'</div>';
+          }else if(u.user_type==='counselor'){
+            verifyInfo='<div style="margin-top:6px;padding:8px 10px;background:#f5f3ff;border-radius:8px;font-size:12px;color:#5b21b6;line-height:1.8">'+
+              '<b>👤 真实姓名：</b>'+esc(vd.real_name||'-')+'<br>'+
+              '<b>🏥 所属机构：</b>'+esc(vd.institution||'-')+'<br>'+
+              '<b>📋 资格证号：</b>'+esc(vd.license_no||'-')+'<br>'+
+              '<b>🔬 专长方向：</b>'+esc(vd.specialization||'-')+'</div>';
+          }
+        }catch(e){}
+      }
+      return '<div class="user-row" style="flex-direction:column;align-items:flex-start"><div style="display:flex;align-items:center;width:100%"><div class="avatar">'+(u.gender==='male'?'👦':'👧')+'</div><div class="info"><div class="name">'+esc(u.nickname||u.username)+' '+typeBadge+verifyBadge+(u.banned?'<span class="banned-tag">已封禁</span>':'')+'</div><div class="sub">@'+esc(u.username)+' · '+fmt(u.created_at)+'</div></div><div class="actions">'+verifyBtns+(u.banned?'<button class="btn btn-green" onclick="unbanUser(\''+u.username+'\')">解封</button>':'<button class="btn btn-pink" onclick="banUser(\''+u.username+'\')">封禁</button>')+'<button class="btn btn-red" onclick="deleteUser(\''+u.username+'\')">删除</button></div></div>'+verifyInfo+'</div>';
+    }).join('')||'<div class="empty">暂无注册用户</div>';
+
+    document.getElementById('device-users-list').innerHTML=s.users.map(u=>'<div class="user-row"><div class="avatar">📱</div><div class="info"><div class="name">'+esc(u.nickname||'未设置昵称')+'</div><div class="sub">'+(u.device_id||'').substring(0,16)+'... · 最近 '+fmt(u.last_seen)+'</div></div><div class="actions"><button class="btn btn-red" onclick="deleteDevice(\''+u.device_id+'\')">删除</button></div></div>').join('')||'<div class="empty">暂无设备用户</div>';
+
+    // AI对话
+    document.getElementById('chat-count').textContent=s.total_chats;
+    const chatDiv=document.getElementById('chat-list');
+    if(s.chat_records&&s.chat_records.length){
+      chatDiv.innerHTML=s.chat_records.map(c=>'<div class="chat-msg"><span class="badge '+(c.role==='user'?'badge-blue':'badge-pink')+'" style="min-width:32px;text-align:center">'+(c.role==='user'?'用户':'AI')+'</span><div class="bubble '+(c.role==='user'?'user':'ai')+'"><div>'+esc(c.message)+'</div><div class="meta">'+(c.gender==='male'?'男':'女')+' · '+fmt(c.created_at)+'</div></div><button class="btn btn-red" style="padding:2px 8px;font-size:11px;flex-shrink:0" onclick="delChat('+c.id+')">删除</button></div>').join('');
+    }else{chatDiv.innerHTML='<div class="empty">暂无对话记录</div>';}
+  }catch(e){document.getElementById('stats-grid').innerHTML='<div class="empty">加载失败: '+esc(e.message)+'</div>';}
+}
+
+// 登录
+function showLogin(){document.getElementById('login-page').style.display='flex';document.getElementById('admin-body').style.display='none';}
+function showAdmin(){document.getElementById('login-page').style.display='none';document.getElementById('admin-body').style.display='block';loadData();}
+
+async function checkLogin(){
+  try{const r=await fetch('/api/admin/stats');if(r.status===401)showLogin();else showAdmin();}
+  catch(e){showLogin();}
+}
+async function doLogin(){
+  const pwd=document.getElementById('login-pwd').value;
+  if(!pwd){document.getElementById('login-err').textContent='请输入密码';document.getElementById('login-err').style.display='block';return;}
+  try{const r=await fetch('/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
+  if(r.ok)showAdmin();else{document.getElementById('login-err').textContent='密码错误';document.getElementById('login-err').style.display='block';}}
+  catch(e){document.getElementById('login-err').textContent='网络错误';document.getElementById('login-err').style.display='block';}
+}
+async function doLogout(){await fetch('/admin/logout',{method:'POST'});showLogin();}
+
+document.getElementById('login-pwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+checkLogin();
+</script>
+</body>
+</html>
