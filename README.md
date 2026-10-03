@@ -1,123 +1,81 @@
-# 心屿 - 心灵港湾
+<div align="center">
+  <img src="docs/assets/overview.png" alt="心屿：情绪陪伴与心理健康平台插图" width="100%" />
+  <h1>心屿 · 心灵港湾</h1>
+  <p>面向大学生的情绪记录、心理测评与 AI 陪伴平台。</p>
+  <p>
+    <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&amp;logoColor=white" alt="Python 3.12" />
+    <img src="https://img.shields.io/badge/Flask-Web-000000?logo=flask&amp;logoColor=white" alt="Flask" />
+    <img src="https://img.shields.io/badge/SQLite-Data-003B57?logo=sqlite&amp;logoColor=white" alt="SQLite" />
+  </p>
+  <p>
+    <a href="#功能亮点">功能亮点</a> ·
+    <a href="#快速启动">快速启动</a> ·
+    <a href="docs/部署指南.md">部署指南</a> ·
+    <a href="docs/技术文档.md">技术文档</a>
+  </p>
+</div>
 
-![心屿：情绪陪伴与心理健康平台](docs/assets/overview.png)
+---
 
-[详细部署指南](docs/部署指南.md) · [技术文档](docs/技术文档.md)
+心屿把日常情绪记录、量表测评、匿名交流和学习辅助工具放在一个 Web 应用中。AI 对话使用小米 MiMo 接口；未配置模型密钥时，非 AI 页面仍可用于本地体验。项目面向心理健康辅助场景，不替代专业诊疗或危机干预。
 
-一款面向大学生的心理健康辅助 Web 应用平台，集 AI 情感对话、心情记录追踪、标准化心理量表测评、匿名社区分享、情感互助匹配、学习辅助工具于一体。
+## 功能亮点
 
-## 功能模块
+| 场景 | 已有模块 |
+|---|---|
+| 认识自己 | 心情记录、情绪趋势、PHQ-9 / GAD-7 / PSS / 睡眠质量量表 |
+| 获得陪伴 | MiMo AI 对话、治愈信箱、虚拟桌宠 |
+| 连接他人 | 匿名社区、评论互动、情感互助匹配 |
+| 安排学习 | 笔记、番茄钟、课表与学习广场 |
+| 平台管理 | 用户与内容管理、数据统计 |
 
-| 模块 | 说明 |
-|------|------|
-| AI 情感助手 | 基于小米 MiMo 大模型的 AI 对话，温暖陪伴 |
-| 情绪中心 | 心情转盘 + 情绪趋势图 + 美食推荐 |
-| 心理测评 | PHQ-9 / GAD-7 / PSS / 睡眠质量 4 份标准量表 |
-| 社区广场 | 匿名树洞倾诉 + 情感互助匹配聊天 |
-| 学习广场 | 笔记 / 番茄钟 / 课表管理 |
-| 治愈信箱 | 给未来的自己写一封信 |
-| 虚拟桌宠 | 陪伴式互动，等级与情绪联动 |
-| 管理后台 | 用户管理 / 数据统计 / 内容审核 |
+## 系统结构
 
-## 技术栈
+```mermaid
+flowchart LR
+    B[浏览器 /web/] --> F[Flask 应用]
+    F --> DB[(SQLite emotion.db)]
+    F --> A[MiMo 模型 API]
+    F --> U[上传文件]
+    M[管理员 /admin] --> F
+```
 
-**前端**
-- HTML5 / CSS3 / JavaScript (ES6+)
-- 单页应用 (SPA)，无框架依赖
-- 响应式设计，适配手机和桌面端
+前端使用 HTML、CSS 和原生 JavaScript；后端位于 `backend/`，提供页面、REST API 和 SQLite 数据存储。仓库中的 Android 客户端与 Web 服务共用部分能力。
 
-**后端**
-- Python 3.12 + Flask
-- SQLite3 数据库
-- bcrypt 密码加密
-- Flask-Limiter
-- 约 45 个 RESTful API 接口
+## 快速启动
 
-**AI**
-- 小米 MiMo v2.5 大语言模型 API
-- System Prompt 角色设定
-- 情绪风险检测与专业建议引导
+在 Windows PowerShell 中从仓库根目录运行：
 
-## 快速开始
-
-```bash
-# 1. 安装依赖
+```powershell
 cd backend
-pip install -r requirements.txt
-
-# 2. 启动后端
-python app.py
-
-# 3. 打开浏览器访问
-# http://localhost:5000/web/
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Copy-Item .env.example .env
+# 编辑 .env：填写 MIMO_API_KEY、SECRET_KEY 和 ADMIN_PASSWORD
+.\.venv\Scripts\python.exe app.py
 ```
 
-## 项目结构
+打开 **http://127.0.0.1:5000/web/**；管理入口为 **http://127.0.0.1:5000/admin**。Linux/macOS、Gunicorn + Nginx、HTTPS、备份和排障步骤见[详细部署指南](docs/部署指南.md)。`python app.py` 使用调试服务器，仅适合本地开发。
 
-```
-xinyu/
-├── backend/                # Flask 后端
-│   ├── app.py             # 主应用 (约 45 个 API)
-│   ├── requirements.txt   # Python 依赖
-│   ├── static/            # 静态资源
-│   └── templates/         # HTML 模板
-├── frontend/               # Web 前端
-│   ├── index.html         # 主页面
-│   ├── script.js          # 核心逻辑
-│   ├── style.css          # 样式
-│   └── db/                # 本地数据
-├── android/                # Android 客户端
-├── docs/                   # 项目文档
-│   ├── 作品说明.md
-│   ├── 技术文档.md
-│   ├── AI技术说明.md
-│   ├── 技术路线.md
-│   └── 项目经历.md
-└── README.md
+## 项目目录
+
+```text
+backend/    Flask 服务、API、静态资源、SQLite 运行数据
+frontend/   Web 前端页面与脚本
+android/    Android 客户端
+docs/       使用、技术与部署文档
 ```
 
-## 核心 API 接口
+## 文档导航
 
-| 模块 | 接口数 | 说明 |
-|------|--------|------|
-| 用户管理 | 8 | 注册、登录、验证、安全问题 |
-| 心情管理 | 2 | 记录与查询 |
-| AI 对话 | 2 | 发送消息、获取历史 |
-| 社区功能 | 8 | 帖子 CRUD、点赞、评论 |
-| 情感互助 | 10 | 档案、匹配、聊天、举报 |
-| 测评系统 | 2 | 结果同步、历史查询 |
-| 管理后台 | 12 | 数据统计、用户/内容管理 |
+| 文档 | 内容 |
+|---|---|
+| [部署指南](docs/部署指南.md) | 本地启动、Linux 服务、HTTPS、备份与故障排查 |
+| [技术文档](docs/技术文档.md) | 系统结构与接口说明 |
+| [AI 技术说明](docs/AI技术说明.md) | AI 能力与实现背景 |
+| [作品说明](docs/作品说明.md) | 产品定位与使用场景 |
 
-## 数据库
+## 数据与安全
 
-共 14 个核心数据表：
+生产部署前请更换示例密钥及管理员密码，保护 `backend/emotion.db`、上传文件和 `.env`。心理健康数据应有清晰的告知、保留与删除策略。仓库目前没有独立的开源许可证文件；公开可见不等于获得复制或商用许可。
 
-- `server_users` — 用户表
-- `moods` — 心情记录
-- `checkins` — 打卡记录
-- `chat_history` — AI 对话历史
-- `anonymous_posts` — 匿名帖子
-- `anonymous_replies` — 帖子评论
-- `anonymous_likes` — 点赞记录
-- `user_devices` — 设备用户
-- `user_events` — 用户事件
-- `test_results_sync` — 测评结果
-- `support_profiles` — 互助档案
-- `support_matches` — 互助匹配
-- `support_messages` — 互助消息
-- `students` — 学生信息
-
-## 部署
-
-开发入口为 `http://localhost:5000/web/`，管理员入口为 `/admin`。生产环境采用 Gunicorn + Nginx + HTTPS；具体命令、环境变量、systemd、备份与排障见[详细部署指南](docs/部署指南.md)。
-
-## 文档
-
-详细文档见 `docs/` 目录：
-- [作品说明](docs/作品说明.md)
-- [技术文档](docs/技术文档.md)
-- [AI 技术说明](docs/AI技术说明.md)
-- [技术路线](docs/技术路线.md)
-- [项目经历](docs/项目经历.md)
-
-## 让每一颗心都被温柔以待
