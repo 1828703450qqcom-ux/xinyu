@@ -55,7 +55,7 @@ Copy-Item .env.example .env
 .\.venv\Scripts\python.exe app.py
 ```
 
-打开 **http://127.0.0.1:5000/web/**；管理入口为 **http://127.0.0.1:5000/admin**。Linux/macOS、Gunicorn + Nginx、HTTPS、备份和排障步骤见[详细部署指南](docs/部署指南.md)。`python app.py` 使用调试服务器，仅适合本地开发。
+打开 [心屿本地页面](http://127.0.0.1:5000/web/)；管理入口为 [后台](http://127.0.0.1:5000/admin)。Linux/macOS、Gunicorn + Nginx、HTTPS、备份和排障步骤见[详细部署指南](docs/部署指南.md)。`python app.py` 使用调试服务器，仅适合本地开发。
 
 ## 项目目录
 
