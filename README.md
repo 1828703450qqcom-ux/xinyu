@@ -1,5 +1,9 @@
 # 心屿 - 心灵港湾
 
+![心屿：情绪陪伴与心理健康平台](docs/assets/overview.png)
+
+[详细部署指南](docs/部署指南.md) · [技术文档](docs/技术文档.md)
+
 一款面向大学生的心理健康辅助 Web 应用平台，集 AI 情感对话、心情记录追踪、标准化心理量表测评、匿名社区分享、情感互助匹配、学习辅助工具于一体。
 
 ## 功能模块
@@ -26,7 +30,7 @@
 - Python 3.12 + Flask
 - SQLite3 数据库
 - bcrypt 密码加密
-- Flask-Session / Flask-Limiter
+- Flask-Limiter
 - 约 45 个 RESTful API 接口
 
 **AI**
@@ -45,7 +49,7 @@ pip install -r requirements.txt
 python app.py
 
 # 3. 打开浏览器访问
-# http://localhost:5000
+# http://localhost:5000/web/
 ```
 
 ## 项目结构
@@ -105,10 +109,7 @@ xinyu/
 
 ## 部署
 
-- Ubuntu Linux 22.04 LTS
-- Nginx 反向代理
-- Gunicorn WSGI 服务器
-- Systemd 服务管理
+开发入口为 `http://localhost:5000/web/`，管理员入口为 `/admin`。生产环境采用 Gunicorn + Nginx + HTTPS；具体命令、环境变量、systemd、备份与排障见[详细部署指南](docs/部署指南.md)。
 
 ## 文档
 
